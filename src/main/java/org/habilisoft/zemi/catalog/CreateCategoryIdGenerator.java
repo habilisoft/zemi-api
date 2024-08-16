@@ -1,11 +1,12 @@
 package org.habilisoft.zemi.catalog;
 
 import lombok.RequiredArgsConstructor;
-import org.habilisoft.zemi.shared.IdGenerator;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
-class CreateCategoryIdGenerator implements IdGenerator {
+class CreateCategoryIdGenerator {
     private final JdbcTemplate jdbcTemplate;
 
     public CategoryId generate() {

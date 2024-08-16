@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.user.domain.Permission;
 import org.habilisoft.zemi.user.domain.PermissionName;
 import org.habilisoft.zemi.user.domain.PermissionRepository;
-import org.habilisoft.zemi.user.exception.PermissionNotFoundException;
+import org.habilisoft.zemi.user.domain.Exceptions;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -23,7 +23,7 @@ public class PermissionService {
 
         permissions.stream().filter(permissionId -> !permissionExistence.containsKey(permissionId))
                 .findAny().ifPresent(permissionId -> {
-                    throw new PermissionNotFoundException(permissionId);
+                    throw new Exceptions.PermissionNotFound(permissionId);
                 });
     }
 }

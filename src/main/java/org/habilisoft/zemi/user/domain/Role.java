@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.habilisoft.zemi.user.AuditableProperties;
 import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.exception.PermissionAlreadyOnRoleException;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -60,7 +59,7 @@ public class Role {
 
     public void addPermissions(Set<PermissionName> permissions, LocalDateTime updatedAt, Username updatedBy) {
         this.permissions.stream().filter(permissions::contains).findAny().ifPresent(p -> {
-            throw new PermissionAlreadyOnRoleException(this.name, p);
+            throw new Exceptions.PermissionAlreadyOnRole(this.name, p);
         });
         this.permissions.addAll(permissions);
         auditableProperties = auditableProperties.update(updatedAt, updatedBy);

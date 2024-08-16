@@ -3,8 +3,6 @@ package org.habilisoft.zemi.util;
 import lombok.Builder;
 import lombok.experimental.UtilityClass;
 import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.command.CreateRole;
-import org.habilisoft.zemi.user.command.CreateUser;
 import org.habilisoft.zemi.user.domain.PermissionName;
 import org.habilisoft.zemi.user.domain.RoleName;
 import org.jetbrains.annotations.NotNull;
@@ -30,26 +28,26 @@ public class Commands {
         }
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "createRoleBuilder")
-        public static CreateRole createRole(RoleName name,
-                                            String description,
-                                            Set<PermissionName> permissions,
-                                            String user,
-                                            LocalDateTime time) {
-            return new CreateRole(name, description, permissions,
-                    Optional.ofNullable(user).orElse(Commands.user),
+        public static org.habilisoft.zemi.user.usecase.Commands.CreateRole createRole(RoleName name,
+                                                                                      String description,
+                                                                                      Set<PermissionName> permissions,
+                                                                                      String user,
+                                                                                      LocalDateTime time) {
+            return new org.habilisoft.zemi.user.usecase.Commands.CreateRole(name, description, permissions,
+                    Optional.ofNullable(user).orElse(org.habilisoft.zemi.util.Commands.user),
                     Optional.ofNullable(time).orElse(now()));
         }
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "createUserBuilder")
-        public static CreateUser createUser(Username username,
-                              String name,
-                              String password,
-                              Boolean changePasswordAtNextLogin,
-                              Set<RoleName> roles,
-                              String user,
-                              LocalDateTime time) {
-            return new CreateUser(username, name, password, changePasswordAtNextLogin, roles,
-                    Optional.ofNullable(user).orElse(Commands.user), Optional.ofNullable(time).orElse(now()));
+        public static org.habilisoft.zemi.user.usecase.Commands.CreateUser createUser(Username username,
+                                                                                      String name,
+                                                                                      String password,
+                                                                                      Boolean changePasswordAtNextLogin,
+                                                                                      Set<RoleName> roles,
+                                                                                      String user,
+                                                                                      LocalDateTime time) {
+            return new org.habilisoft.zemi.user.usecase.Commands.CreateUser(username, name, password, changePasswordAtNextLogin, roles,
+                    Optional.ofNullable(user).orElse(org.habilisoft.zemi.util.Commands.user), Optional.ofNullable(time).orElse(now()));
         }
     }
 }

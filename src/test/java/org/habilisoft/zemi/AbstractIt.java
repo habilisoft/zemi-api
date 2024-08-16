@@ -9,14 +9,12 @@ import org.habilisoft.zemi.tenant.TenantService;
 import org.habilisoft.zemi.tenant.infra.TenantContext;
 import org.habilisoft.zemi.user.UserService;
 import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.command.CreateRole;
-import org.habilisoft.zemi.user.command.CreateUser;
+import org.habilisoft.zemi.user.usecase.Commands;
 import org.habilisoft.zemi.user.domain.RoleName;
 import org.habilisoft.zemi.user.domain.RoleRepository;
 import org.habilisoft.zemi.user.jwt.AuthConstants;
 import org.habilisoft.zemi.user.jwt.JwtRequest;
 import org.habilisoft.zemi.user.jwt.JwtService;
-import org.habilisoft.zemi.util.Commands;
 import org.habilisoft.zemi.util.Requests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,12 +78,12 @@ public abstract class AbstractIt {
     @BeforeEach
     void setUp() {
         tenantContext.set(tenant);
-        CreateRole createAdminRole = Commands.Users.adminRole().build();
+        Commands.CreateRole createAdminRole = org.habilisoft.zemi.util.Commands.Users.adminRole().build();
         RoleName roleName = createAdminRole.name();
         if (!roleRepository.existsById(roleName)) {
             userService.createRole(createAdminRole);
         }
-        CreateUser createUser = Commands.Users.createUserBuilder()
+        Commands.CreateUser createUser = org.habilisoft.zemi.util.Commands.Users.createUserBuilder()
                 .username(username)
                 .name("Test User")
                 .roles(Set.of(roleName))

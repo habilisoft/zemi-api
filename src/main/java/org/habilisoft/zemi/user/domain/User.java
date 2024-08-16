@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.habilisoft.zemi.user.AuditableProperties;
 import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.exception.RoleAlreadyOnUserException;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -59,7 +58,7 @@ public class User implements Serializable {
     }
     public void addRoles(Set<RoleName> roles, LocalDateTime updatedAt, Username updatedBy) {
         this.roles.stream().filter(roles::contains).findAny().ifPresent(r -> {
-            throw new RoleAlreadyOnUserException(this.username, r);
+            throw new Exceptions.RoleAlreadyOnUser(this.username, r);
         });
         this.roles.addAll(roles);
         this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);

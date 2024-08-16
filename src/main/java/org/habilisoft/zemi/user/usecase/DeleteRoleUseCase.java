@@ -2,44 +2,37 @@ package org.habilisoft.zemi.user.usecase;
 
 
 import lombok.RequiredArgsConstructor;
-import org.habilisoft.zemi.shared.IdempotentUseCase;
+import org.habilisoft.zemi.shared.UseCase;
 import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.command.DeleteRole;
 import org.habilisoft.zemi.user.domain.Role;
 import org.habilisoft.zemi.user.domain.RoleName;
 import org.habilisoft.zemi.user.domain.RoleRepository;
 import org.habilisoft.zemi.user.domain.UserRepository;
-import org.habilisoft.zemi.user.exception.CantDeleteSystemRoleException;
-import org.habilisoft.zemi.user.exception.RoleInUseException;
-import org.habilisoft.zemi.user.exception.RoleNotFoundException;
+import org.habilisoft.zemi.user.domain.Exceptions;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-
+@Service
 @RequiredArgsConstructor
-public class DeleteRoleUseCase implements IdempotentUseCase<DeleteRole, Void> {
+public class DeleteRoleUseCase implements UseCase<Commands.DeleteRole, Void> {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
 
     @Override
-    public Void execute(DeleteRole deleteRole) {
+    public Void execute(Commands.DeleteRole deleteRole) {
         RoleName roleName = deleteRole.roleName();
-        Role role = roleRepository.findById(roleName).orElseThrow(() -> new RoleNotFoundException(roleName));
+        Role role = roleRepository.findById(roleName).orElseThrow(() -> new Exceptions.RoleNotFound(roleName));
         if (role.isSystemRole()) {
-            throw new CantDeleteSystemRoleException();
+            throw new Exceptions.CantDeleteSystemRole();
         }
         int userCount = userRepository.countUsersByRole(roleName);
         if (userCount > 0) {
-            throw new RoleInUseException(roleName, userCount);
+            throw new Exceptions.RoleInUse(roleName, userCount);
         }
         Username username = Username.of(deleteRole.user());
         LocalDateTime time = deleteRole.time();
         role.delete(time, username);
         roleRepository.save(role);
         return null;
-    }
-
-    @Override
-    public String idempotencyKey(DeleteRole deleteRole) {
-        return deleteRole.roleName().value();
     }
 }
