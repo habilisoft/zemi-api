@@ -2,7 +2,9 @@ package org.habilisoft.zemi.catalog;
 
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.shared.UseCase;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 class RegisterProductUseCase implements UseCase<RegisterProduct, ProductId> {
     private final ProductIdGenerator productIdGenerator;

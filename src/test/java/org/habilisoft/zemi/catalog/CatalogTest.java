@@ -2,13 +2,12 @@ package org.habilisoft.zemi.catalog;
 
 import com.jayway.jsonpath.JsonPath;
 import org.habilisoft.zemi.AbstractIt;
-import org.habilisoft.zemi.catalog.api.CreateCategoryRequest;
-import org.habilisoft.zemi.catalog.api.RegisterProductRequest;
-import org.habilisoft.zemi.util.Requests;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,9 +21,7 @@ class CatalogTest extends AbstractIt {
     void shouldRegisterAProduct() throws Exception {
         // Given
         String pizza = "Pizza";
-        RegisterProductRequest registerPizza = Requests.Catalog.registerProductBuilder()
-                .name(pizza)
-                .build();
+        Map<String, Object> registerPizza = Map.of("name", pizza);
         // When
         MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -33,10 +30,10 @@ class CatalogTest extends AbstractIt {
                         .content(serializeRequestToJson(registerPizza))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.value").isNotEmpty())
+                .andExpect(jsonPath("$.id").isNotEmpty())
                 .andReturn();
         // Then
-        Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.value");
+        Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
         var productRow = jdbcClient.sql("SELECT * FROM products WHERE id = :id")
                 .param("id", id)
                 .query(rowMapper)
@@ -49,9 +46,7 @@ class CatalogTest extends AbstractIt {
     void shouldCreateACategory() throws Exception {
         // Given
         String food = "Food";
-        CreateCategoryRequest createFoodCategory = Requests.Catalog.createCategoryBuilder()
-                .name(food)
-                .build();
+        Map<String, Object> createFoodCategory = Map.of("name", food);
         // When
         MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -60,10 +55,10 @@ class CatalogTest extends AbstractIt {
                         .content(serializeRequestToJson(createFoodCategory))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.value").isNotEmpty())
+                .andExpect(jsonPath("$.id").isNotEmpty())
                 .andReturn();
         // Then
-        Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.value");
+        Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
         var categoryRow = jdbcClient.sql("SELECT * FROM categories WHERE id = :id")
                 .param("id", id)
                 .query(rowMapper)
@@ -76,9 +71,7 @@ class CatalogTest extends AbstractIt {
     void shouldRegisterAProductWithACategory() throws Exception {
         // Given
         String food = "Food";
-        CreateCategoryRequest createFoodCategory = Requests.Catalog.createCategoryBuilder()
-                .name(food)
-                .build();
+        Map<String, Object> createFoodCategory = Map.of("name", food);
         MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
@@ -86,14 +79,11 @@ class CatalogTest extends AbstractIt {
                         .content(serializeRequestToJson(createFoodCategory))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.value").isNotEmpty())
+                .andExpect(jsonPath("$.id").isNotEmpty())
                 .andReturn();
-        Integer categoryId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.value");
+        Integer categoryId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
         String pizza = "Pizza";
-        RegisterProductRequest registerPizza = Requests.Catalog.registerProductBuilder()
-                .name(pizza)
-                .categoryId(categoryId)
-                .build();
+        Map<String, Object> registerPizza = Map.of("name", pizza, "categoryId", categoryId);
         // When
         mvcResult = mockMvc.perform(post("/catalog/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,10 +92,10 @@ class CatalogTest extends AbstractIt {
                         .content(serializeRequestToJson(registerPizza))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.value").isNotEmpty())
+                .andExpect(jsonPath("$.id").isNotEmpty())
                 .andReturn();
         // Then
-        Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.value");
+        Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
         var productRow = jdbcClient.sql("SELECT * FROM products WHERE id = :id")
                 .param("id", id)
                 .query(rowMapper)
@@ -119,10 +109,7 @@ class CatalogTest extends AbstractIt {
     void shouldNotRegisterAProductWithANonExistentCategory() throws Exception {
         // Given
         String pizza = "Pizza";
-        RegisterProductRequest registerPizza = Requests.Catalog.registerProductBuilder()
-                .name(pizza)
-                .categoryId(999)
-                .build();
+        Map<String, Object> registerPizza = Map.of("name", pizza, "categoryId", 1);
         // When
         mockMvc.perform(post("/catalog/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)

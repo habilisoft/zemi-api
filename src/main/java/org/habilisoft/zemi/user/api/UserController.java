@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.user.UserService;
 import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.domain.RoleName;
 import org.habilisoft.zemi.user.domain.User;
 import org.habilisoft.zemi.user.usecase.Commands;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,6 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -31,11 +29,11 @@ public class UserController {
     @RolesAllowed({"admin", "auth:user:create"})
     public void createUser(@Valid @RequestBody Requests.CreateUser request) {
         Commands.CreateUser command = new Commands.CreateUser(
-                Username.of(request.name()),
                 request.username(),
+                request.name(),
                 request.password(),
                 request.changePasswordAtNextLogin(),
-                request.roles().stream().map(RoleName::from).collect(Collectors.toSet()),
+                request.roles(),
                 userService.getCurrentUser(),
                 LocalDateTime.now()
         );
@@ -52,7 +50,7 @@ public class UserController {
                             .map(GrantedAuthority::getAuthority)
                             .toList();
                     Responses.User response = new Responses.User(
-                            user.getUsername().value(),
+                            user.getUsername(),
                             user.getName(),
                             user.getChangePasswordAtNextLogin(),
                             permissions
@@ -81,7 +79,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void resetPassword(@Valid @RequestBody Requests.ResetPassword request) {
         Commands.ResetPassword command = new Commands.ResetPassword(
-                Username.of(request.username()),
+                request.username(),
                 request.password(),
                 request.changePasswordAtNextLogin(),
                 userService.getCurrentUser(),
@@ -94,12 +92,12 @@ public class UserController {
     @RolesAllowed({"admin", "auth:user:edit"})
     @PostMapping("{username}/roles")
     @ResponseStatus(HttpStatus.OK)
-    public void addRoleToUser(@PathVariable String username,
+    public void addRoleToUser(@PathVariable Username username,
                               @Valid @RequestBody Requests.AddRolesToUser request) {
         userService.addRolesToUser(
                 new Commands.AddRolesToUser(
-                        Username.of(username),
-                        request.roles().stream().map(RoleName::from).collect(Collectors.toSet()),
+                        username,
+                        request.roles(),
                         userService.getCurrentUser(),
                         LocalDateTime.now()
                 )
@@ -109,12 +107,12 @@ public class UserController {
     @RolesAllowed({"admin", "auth:user:edit"})
     @PostMapping("{username}/roles/remove")
     @ResponseStatus(HttpStatus.OK)
-    public void removeRolesFromUser(@PathVariable String username,
+    public void removeRolesFromUser(@PathVariable Username username,
                                     @Valid @RequestBody Requests.RemoveRolesFromUser request) {
         userService.removeRoleFromUser(
                 new Commands.RemoveRolesFromUser(
-                        Username.of(username),
-                        request.roles().stream().map(RoleName::from).collect(Collectors.toSet()),
+                        username,
+                        request.roles(),
                         userService.getCurrentUser(),
                         LocalDateTime.now()
                 )
@@ -124,10 +122,10 @@ public class UserController {
     @RolesAllowed({"admin", "auth:user:delete"})
     @DeleteMapping("{username}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteUser(@PathVariable String username) {
+    public void deleteUser(@PathVariable Username username) {
         userService.deleteUser(
                 new Commands.DeleteUser(
-                        Username.of(username),
+                        username,
                         userService.getCurrentUser(),
                         LocalDateTime.now()
                 )

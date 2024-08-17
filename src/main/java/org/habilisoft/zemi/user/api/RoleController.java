@@ -4,15 +4,12 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.user.UserService;
-import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.domain.PermissionName;
 import org.habilisoft.zemi.user.domain.RoleName;
 import org.habilisoft.zemi.user.usecase.Commands;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,9 +22,9 @@ public class RoleController {
     @RolesAllowed({"admin", "auth:role:create"})
     public void createRole(@Valid @RequestBody Requests.CreateRole request) {
         Commands.CreateRole createRole = new Commands.CreateRole(
-                RoleName.from(request.name()),
+                request.name(),
                 request.description(),
-                request.permissions().stream().map(PermissionName::from).collect(Collectors.toSet()),
+                request.permissions(),
                 userService.getCurrentUser(),
                 LocalDateTime.now()
         );
@@ -36,12 +33,12 @@ public class RoleController {
 
     @PostMapping("/{roleName}")
     @RolesAllowed({"admin", "auth:role:update"})
-    public void updateRole(@PathVariable String roleName,
+    public void updateRole(@PathVariable RoleName roleName,
                                            @Valid @RequestBody Requests.CreateRole request) {
         Commands.EditRole command = new Commands.EditRole(
-                RoleName.from(roleName),
+                roleName,
                 request.description(),
-                request.permissions().stream().map(PermissionName::from).collect(Collectors.toSet()),
+                request.permissions(),
                 userService.getCurrentUser(),
                 LocalDateTime.now()
         );
@@ -50,11 +47,11 @@ public class RoleController {
 
     @PostMapping("{roleName}/permissions")
     @RolesAllowed({"admin", "auth:role:create"})
-    public void assignPermissionsToRole(@PathVariable String roleName,
+    public void assignPermissionsToRole(@PathVariable RoleName roleName,
                                                   @Valid @RequestBody Requests.AssignPermissionsToRole request) {
         Commands.AddPermissionsToRole command = new Commands.AddPermissionsToRole(
-                RoleName.from(roleName),
-                request.permissions().stream().map(PermissionName::from).collect(Collectors.toSet()),
+                roleName,
+                request.permissions(),
                 userService.getCurrentUser(),
                 LocalDateTime.now()
         );
@@ -63,11 +60,11 @@ public class RoleController {
 
     @DeleteMapping("/{roleName}/permissions")
     @RolesAllowed({"admin", "auth:role:delete"})
-    public void removePermissionsFromRole(@PathVariable String roleName,
+    public void removePermissionsFromRole(@PathVariable RoleName roleName,
                                                        @Valid @RequestBody Requests.RemovePermissionsFromRole request) {
         Commands.RemovePermissionsFromRole removePermissionsFromRole = new Commands.RemovePermissionsFromRole(
-                RoleName.from(roleName),
-                request.permissions().stream().map(PermissionName::from).collect(Collectors.toSet()),
+                roleName,
+                request.permissions(),
                 userService.getCurrentUser(),
                 LocalDateTime.now()
         );
@@ -76,11 +73,11 @@ public class RoleController {
 
     @PostMapping("{roleName}/assign")
     @RolesAllowed({"admin", "auth:user:update"})
-    public void assignRoleToUsers(@PathVariable String roleName,
+    public void assignRoleToUsers(@PathVariable RoleName roleName,
                                                @Valid @RequestBody Requests.AssignRoleToUsers request) {
         Commands.AssignRoleToUsers assignRoleToUsers = new Commands.AssignRoleToUsers(
-                RoleName.from(roleName),
-                request.users().stream().map(Username::of).collect(Collectors.toSet()),
+                roleName,
+                request.users(),
                 userService.getCurrentUser(),
                 LocalDateTime.now()
         );
@@ -89,9 +86,9 @@ public class RoleController {
 
     @DeleteMapping("/{roleName}")
     @RolesAllowed({"admin", "auth:role:delete"})
-    public void deleteRole(@PathVariable String roleName) {
+    public void deleteRole(@PathVariable RoleName roleName) {
         Commands.DeleteRole deleteRole = new Commands.DeleteRole(
-                RoleName.from(roleName),
+                roleName,
                 userService.getCurrentUser(),
                 LocalDateTime.now()
         );

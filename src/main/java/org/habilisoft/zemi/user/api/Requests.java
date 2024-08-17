@@ -4,29 +4,32 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.habilisoft.zemi.user.Username;
+import org.habilisoft.zemi.user.domain.PermissionName;
+import org.habilisoft.zemi.user.domain.RoleName;
 
-import java.util.List;
+import java.util.Set;
 
 public interface Requests {
-    record RemoveRolesFromUser(@NotEmpty List<String> roles) { }
-    record RemovePermissionsFromRole(List<String> permissions) { }
+    record RemoveRolesFromUser(@NotEmpty Set<RoleName> roles) { }
+    record RemovePermissionsFromRole(Set<PermissionName> permissions) { }
 
     record CreateUser(
             @NotBlank(message = "Username is required")
-            String username,
+            Username username,
             @NotBlank(message = "Password is required")
             @Size(min = 8, message = "Password must be at least 8 characters")
             String password,
             @NotBlank(message = "Name is required")
             String name,
-            List<String> roles,
+            Set<RoleName> roles,
             Boolean changePasswordAtNextLogin
     ) { }
 
     record CreateRole(
-            @NotEmpty String name,
+            @NotEmpty RoleName name,
             @NotEmpty String description,
-            @NotEmpty List<String> permissions
+            @NotEmpty Set<PermissionName> permissions
     ) { }
 
     record ChangePassword(
@@ -38,14 +41,14 @@ public interface Requests {
             String newPassword
     ) { }
 
-    record AssignRoleToUsers(@NotEmpty List<String> users) { }
+    record AssignRoleToUsers(@NotEmpty Set<Username> users) { }
 
-    record AssignPermissionsToRole(List<String> permissions) { }
+    record AssignPermissionsToRole(Set<PermissionName> permissions) { }
 
-    record AddRolesToUser(@NotEmpty List<String> roles) { }
+    record AddRolesToUser(@NotEmpty Set<RoleName> roles) { }
 
     record ResetPassword(
-            @NotNull String username,
+            @NotNull Username username,
             @NotNull
             @Size(min = 8, message = "Password must be at least 8 characters")
             String password,

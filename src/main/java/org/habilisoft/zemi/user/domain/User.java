@@ -25,6 +25,8 @@ public class User implements Serializable {
     private String name;
     private String password;
     private Boolean deleted;
+
+    @Embedded
     @AttributeOverride(name = "createdBy.value", column = @Column(name = "created_by"))
     @AttributeOverride(name = "updatedBy.value", column = @Column(name = "updated_by"))
     private AuditableProperties auditableProperties;
@@ -52,10 +54,12 @@ public class User implements Serializable {
         this.changePasswordAtNextLogin = changePasswordAtNextLogin;
         this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);
     }
+
     public void removeRoles(Set<RoleName> roles, LocalDateTime updatedAt, Username updatedBy) {
         roles.forEach(this.roles::remove);
         this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);
     }
+
     public void addRoles(Set<RoleName> roles, LocalDateTime updatedAt, Username updatedBy) {
         this.roles.stream().filter(roles::contains).findAny().ifPresent(r -> {
             throw new Exceptions.RoleAlreadyOnUser(this.username, r);
@@ -63,6 +67,7 @@ public class User implements Serializable {
         this.roles.addAll(roles);
         this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);
     }
+
     public void delete(LocalDateTime updatedAt, Username updatedBy) {
         this.deleted = true;
         this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);

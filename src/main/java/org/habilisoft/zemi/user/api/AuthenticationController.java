@@ -1,9 +1,11 @@
-package org.habilisoft.zemi.user.jwt;
+package org.habilisoft.zemi.user.api;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.habilisoft.zemi.user.jwt.JwtRequest;
+import org.habilisoft.zemi.user.jwt.JwtService;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/v1")
-public class JwtAuthenticationController {
+public class AuthenticationController {
     private final JwtService authenticationService;
 
     @PostMapping("/authenticate")
