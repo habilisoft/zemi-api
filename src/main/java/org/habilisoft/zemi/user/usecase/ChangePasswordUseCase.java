@@ -22,6 +22,7 @@ public class ChangePasswordUseCase implements UseCase<Commands.ChangePassword, V
             throw new Exceptions.InvalidOldPassword();
         }
         user.setPassword(passwordEncoder.encode(command.newPassword()));
+        user.setChangePasswordAtNextLogin(false);
         userRepository.save(user);
         return null;
     }

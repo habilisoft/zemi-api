@@ -1,6 +1,7 @@
 package org.habilisoft.zemi.user;
 
 import lombok.RequiredArgsConstructor;
+import org.habilisoft.zemi.user.domain.User;
 import org.habilisoft.zemi.user.usecase.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class UserService {
     private final DeleteUserUseCase deleteUserUseCase;
 
     public String getCurrentUser() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+        return ((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername().value();
     }
 
     public void createUser(Commands.CreateUser createUser) {
