@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.shared.UseCase;
 import org.habilisoft.zemi.user.Username;
 import org.habilisoft.zemi.user.domain.*;
-import org.habilisoft.zemi.user.domain.Exceptions;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,12 +15,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AddRolesToUserUseCase implements UseCase<Commands.AddRolesToUser, Boolean> {
+public class AddRolesToUserUseCase implements UseCase<UserCommands.AddRolesToUser, Boolean> {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
     @Override
-    public Boolean execute(Commands.AddRolesToUser addRolesToUser) {
+    public Boolean execute(UserCommands.AddRolesToUser addRolesToUser) {
         User user = userRepository.findById(addRolesToUser.username())
                 .orElseThrow(() -> new Exceptions.UserNotFound(addRolesToUser.username()));
         Set<RoleName> roles = addRolesToUser.roles();

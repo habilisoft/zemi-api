@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.user.UserService;
 import org.habilisoft.zemi.user.domain.RoleName;
-import org.habilisoft.zemi.user.usecase.Commands;
+import org.habilisoft.zemi.user.usecase.UserCommands;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,7 @@ public class RoleController {
     @ResponseStatus(HttpStatus.CREATED)
     @RolesAllowed({"admin", "auth:role:create"})
     public void createRole(@Valid @RequestBody Requests.CreateRole request) {
-        Commands.CreateRole createRole = new Commands.CreateRole(
+        UserCommands.CreateRole createRole = new UserCommands.CreateRole(
                 request.name(),
                 request.description(),
                 request.permissions(),
@@ -35,7 +35,7 @@ public class RoleController {
     @RolesAllowed({"admin", "auth:role:update"})
     public void updateRole(@PathVariable RoleName roleName,
                                            @Valid @RequestBody Requests.CreateRole request) {
-        Commands.EditRole command = new Commands.EditRole(
+        UserCommands.EditRole command = new UserCommands.EditRole(
                 roleName,
                 request.description(),
                 request.permissions(),
@@ -49,7 +49,7 @@ public class RoleController {
     @RolesAllowed({"admin", "auth:role:create"})
     public void assignPermissionsToRole(@PathVariable RoleName roleName,
                                                   @Valid @RequestBody Requests.AssignPermissionsToRole request) {
-        Commands.AddPermissionsToRole command = new Commands.AddPermissionsToRole(
+        UserCommands.AddPermissionsToRole command = new UserCommands.AddPermissionsToRole(
                 roleName,
                 request.permissions(),
                 userService.getCurrentUser(),
@@ -62,7 +62,7 @@ public class RoleController {
     @RolesAllowed({"admin", "auth:role:delete"})
     public void removePermissionsFromRole(@PathVariable RoleName roleName,
                                                        @Valid @RequestBody Requests.RemovePermissionsFromRole request) {
-        Commands.RemovePermissionsFromRole removePermissionsFromRole = new Commands.RemovePermissionsFromRole(
+        UserCommands.RemovePermissionsFromRole removePermissionsFromRole = new UserCommands.RemovePermissionsFromRole(
                 roleName,
                 request.permissions(),
                 userService.getCurrentUser(),
@@ -75,7 +75,7 @@ public class RoleController {
     @RolesAllowed({"admin", "auth:user:update"})
     public void assignRoleToUsers(@PathVariable RoleName roleName,
                                                @Valid @RequestBody Requests.AssignRoleToUsers request) {
-        Commands.AssignRoleToUsers assignRoleToUsers = new Commands.AssignRoleToUsers(
+        UserCommands.AssignRoleToUsers assignRoleToUsers = new UserCommands.AssignRoleToUsers(
                 roleName,
                 request.users(),
                 userService.getCurrentUser(),
@@ -87,7 +87,7 @@ public class RoleController {
     @DeleteMapping("/{roleName}")
     @RolesAllowed({"admin", "auth:role:delete"})
     public void deleteRole(@PathVariable RoleName roleName) {
-        Commands.DeleteRole deleteRole = new Commands.DeleteRole(
+        UserCommands.DeleteRole deleteRole = new UserCommands.DeleteRole(
                 roleName,
                 userService.getCurrentUser(),
                 LocalDateTime.now()

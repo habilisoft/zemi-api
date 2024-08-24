@@ -2,9 +2,13 @@ package org.habilisoft.zemi.util;
 
 import lombok.Builder;
 import lombok.experimental.UtilityClass;
+import org.habilisoft.zemi.catalog.category.application.CreateCategory;
+import org.habilisoft.zemi.catalog.category.domain.CategoryId;
+import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
 import org.habilisoft.zemi.user.Username;
 import org.habilisoft.zemi.user.domain.PermissionName;
 import org.habilisoft.zemi.user.domain.RoleName;
+import org.habilisoft.zemi.user.usecase.UserCommands;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
@@ -26,28 +30,44 @@ public class Commands {
                     .description("Administrator Role")
                     .permissions(Set.of(PermissionName.from("auth:role:create")));
         }
+
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "createRoleBuilder")
-        public static org.habilisoft.zemi.user.usecase.Commands.CreateRole createRole(RoleName name,
-                                                                                      String description,
-                                                                                      Set<PermissionName> permissions,
-                                                                                      String user,
-                                                                                      LocalDateTime time) {
-            return new org.habilisoft.zemi.user.usecase.Commands.CreateRole(name, description, permissions,
+        public static UserCommands.CreateRole createRole(RoleName name,
+                                                         String description,
+                                                         Set<PermissionName> permissions,
+                                                         String user,
+                                                         LocalDateTime time) {
+            return new UserCommands.CreateRole(name, description, permissions,
                     Optional.ofNullable(user).orElse(org.habilisoft.zemi.util.Commands.user),
                     Optional.ofNullable(time).orElse(now()));
         }
+
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "createUserBuilder")
-        public static org.habilisoft.zemi.user.usecase.Commands.CreateUser createUser(Username username,
-                                                                                      String name,
-                                                                                      String password,
-                                                                                      Boolean changePasswordAtNextLogin,
-                                                                                      Set<RoleName> roles,
-                                                                                      String user,
-                                                                                      LocalDateTime time) {
-            return new org.habilisoft.zemi.user.usecase.Commands.CreateUser(username, name, password, changePasswordAtNextLogin, roles,
+        public static UserCommands.CreateUser createUser(Username username,
+                                                         String name,
+                                                         String password,
+                                                         Boolean changePasswordAtNextLogin,
+                                                         Set<RoleName> roles,
+                                                         String user,
+                                                         LocalDateTime time) {
+            return new UserCommands.CreateUser(username, name, password, changePasswordAtNextLogin, roles,
                     Optional.ofNullable(user).orElse(org.habilisoft.zemi.util.Commands.user), Optional.ofNullable(time).orElse(now()));
+        }
+    }
+    public class Catalog {
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "registerProductBuilder")
+        public static RegisterProduct registerProduct(String name, CategoryId categoryId, Boolean isService, String user, LocalDateTime time) {
+            return new RegisterProduct(Optional.ofNullable(categoryId), name, Optional.ofNullable(isService).orElse(false),
+                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "createCategoryBuilder")
+        public static CreateCategory createCategory(String name, String user, LocalDateTime time) {
+            return new CreateCategory(name, Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
         }
     }
 }

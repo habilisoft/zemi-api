@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
-public interface Commands {
+public interface UserCommands {
     record AddPermissionsToRole(RoleName roleName,
                                 Set<PermissionName> permissions,
                                 String user,

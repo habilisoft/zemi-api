@@ -26,41 +26,41 @@ public class UserService {
         return ((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername().value();
     }
 
-    public void createUser(Commands.CreateUser createUser) {
+    public void createUser(UserCommands.CreateUser createUser) {
         createUserUseCase.execute(createUser);
     }
 
-    public void createRole(Commands.CreateRole createRole) {
+    public void createRole(UserCommands.CreateRole createRole) {
         createRoleUseCase.execute(createRole);
     }
-    public void editRole(Commands.EditRole editRole){
+    public void editRole(UserCommands.EditRole editRole){
         editRoleUseCase.execute(editRole);
     }
-    public void deleteRole(Commands.DeleteRole role){
+    public void deleteRole(UserCommands.DeleteRole role){
         deleteRoleUseCase.execute(role);
     }
-    public void addRolesToUser(Commands.AddRolesToUser addRolesToUser){
+    public void addRolesToUser(UserCommands.AddRolesToUser addRolesToUser){
         addRolesToUserUseCase.execute(addRolesToUser);
     }
-    public void assignRoleToUsers(Commands.AssignRoleToUsers assignRoleToUsers){
+    public void assignRoleToUsers(UserCommands.AssignRoleToUsers assignRoleToUsers){
         assignRoleToUsersUseCase.execute(assignRoleToUsers);
     }
-    public void removeRoleFromUser(Commands.RemoveRolesFromUser removeRolesFromUser){
+    public void removeRoleFromUser(UserCommands.RemoveRolesFromUser removeRolesFromUser){
         removeRolesFromUserUseCase.execute(removeRolesFromUser);
     }
-    public void addPermissionsToRole(Commands.AddPermissionsToRole addPermissionsToRole){
+    public void addPermissionsToRole(UserCommands.AddPermissionsToRole addPermissionsToRole){
         addPermissionsToRoleUseCase.execute(addPermissionsToRole);
     }
-    public void removePermissionsFromRole(Commands.RemovePermissionsFromRole removePermissionsFromRole){
+    public void removePermissionsFromRole(UserCommands.RemovePermissionsFromRole removePermissionsFromRole){
         removePermissionsFromRoleUseCase.execute(removePermissionsFromRole);
     }
-    public void changePassword(Commands.ChangePassword changePassword){
+    public void changePassword(UserCommands.ChangePassword changePassword){
         changePasswordUseCase.execute(changePassword);
     }
-    public void resetPassword(Commands.ResetPassword resetPassword){
+    public void resetPassword(UserCommands.ResetPassword resetPassword){
         resetPasswordUseCase.execute(resetPassword);
     }
-    public void deleteUser(Commands.DeleteUser deleteUser){
+    public void deleteUser(UserCommands.DeleteUser deleteUser){
         deleteUserUseCase.execute(deleteUser);
     }
 }

@@ -3,6 +3,10 @@ package org.habilisoft.zemi.catalog;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.servlet.http.Cookie;
 import org.habilisoft.zemi.AbstractIt;
+import org.habilisoft.zemi.catalog.category.domain.Category;
+import org.habilisoft.zemi.catalog.category.domain.CategoryId;
+import org.habilisoft.zemi.catalog.product.domain.Product;
+import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -35,36 +39,26 @@ class CatalogTest extends AbstractIt {
                 .andReturn();
         // Then
         Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
-        var productRow = jdbcClient.sql("SELECT * FROM products WHERE id = :id")
-                .param("id", id)
-                .query(rowMapper)
-                .single();
-        assertThat(productRow.get("name")).hasToString(pizza);
-        assertThat(productRow.get("created_at")).isNotNull();
-        assertThat(productRow.get("created_by")).hasToString(username.value());
+        assertThat(catalogContext.productRepository.findById(ProductId.of(id.longValue())))
+                .isPresent()
+                .hasValueSatisfying(product -> {
+                    assertThat(product.getName()).isEqualTo(pizza);
+                    assertThat(product.getAuditableProperties().createdBy()).isEqualTo(username);
+                    assertThat(product.getAuditableProperties().createdAt()).isNotNull();
+                });
     }
 
     @Test
     @DisplayName("Should update a product")
     void shouldUpdateAProduct() throws Exception {
         // Given
-        String pizza = "Pizza";
-        Map<String, Object> registerPizza = Map.of("name", pizza);
-        Cookie jwtToken = jwtToken(username);
-        MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken)
-                        .content(serializeRequestToJson(registerPizza))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").isNotEmpty())
-                .andReturn();
-        Integer productId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        Product pizza = catalogFixtures.product1();
+        ProductId productId = pizza.getId();
         String burger = "Burger";
         Map<String, Object> updateBurgerProduct = Map.of("name", burger);
+        Cookie jwtToken = jwtToken(username);
         // When
-        mockMvc.perform(post("/catalog/v1/products/{id}", productId)
+        mockMvc.perform(post("/catalog/v1/products/{id}", productId.value())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
                         .cookie(jwtToken)
@@ -72,13 +66,13 @@ class CatalogTest extends AbstractIt {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         // Then
-        var productRow = jdbcClient.sql("SELECT * FROM products WHERE id = :id")
-                .param("id", productId)
-                .query(rowMapper)
-                .single();
-        assertThat(productRow.get("name")).hasToString(burger);
-        assertThat(productRow.get("updated_at")).isNotNull();
-        assertThat(productRow.get("updated_by")).hasToString(username.value());
+        assertThat(catalogContext.productRepository.findById(pizza.getId()))
+                .isPresent()
+                .hasValueSatisfying(product -> {
+                    assertThat(product.getName()).isEqualTo(burger);
+                    assertThat(product.getAuditableProperties().updatedBy()).isEqualTo(username);
+                    assertThat(product.getAuditableProperties().updatedAt()).isNotNull();
+                });
     }
 
     @Test
@@ -99,34 +93,24 @@ class CatalogTest extends AbstractIt {
                 .andReturn();
         // Then
         Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
-        var categoryRow = jdbcClient.sql("SELECT * FROM categories WHERE id = :id")
-                .param("id", id)
-                .query(rowMapper)
-                .single();
-        assertThat(categoryRow.get("name")).hasToString(food);
-        assertThat(categoryRow.get("created_at")).isNotNull();
-        assertThat(categoryRow.get("created_by")).hasToString(username.value());
+        assertThat(catalogContext.categoryRepository.findById(CategoryId.of(id.longValue())))
+                .isPresent()
+                .hasValueSatisfying(category -> {
+                    assertThat(category.getName()).isEqualTo(food);
+                    assertThat(category.getAuditableProperties().createdBy()).isEqualTo(username);
+                    assertThat(category.getAuditableProperties().createdAt()).isNotNull();
+                });
     }
 
     @Test
     @DisplayName("Should update a category")
     void shouldUpdateACategory() throws Exception {
         // Given
-        String food = "Food";
-        Map<String, Object> createFoodCategory = Map.of("name", food);
-        Cookie jwtToken = jwtToken(username);
-        MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/categories")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken)
-                        .content(serializeRequestToJson(createFoodCategory))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").isNotEmpty())
-                .andReturn();
-        Integer categoryId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        Category food = catalogFixtures.category1();
+        Long categoryId = food.getId().value();
         String fastFood = "Fast Food";
         Map<String, Object> updateFastFoodCategory = Map.of("name", fastFood);
+        Cookie jwtToken = jwtToken(username);
         // When
         mockMvc.perform(post("/catalog/v1/categories/{id}", categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -136,36 +120,25 @@ class CatalogTest extends AbstractIt {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         // Then
-        var categoryRow = jdbcClient.sql("SELECT * FROM categories WHERE id = :id")
-                .param("id", categoryId)
-                .query(rowMapper)
-                .single();
-        assertThat(categoryRow.get("name")).hasToString(fastFood);
-        assertThat(categoryRow.get("updated_at")).isNotNull();
-        assertThat(categoryRow.get("updated_by")).hasToString(username.value());
+        assertThat(catalogContext.categoryRepository.findById(food.getId()))
+                .isPresent()
+                .hasValueSatisfying(category -> {
+                    assertThat(category.getName()).isEqualTo(fastFood);
+                    assertThat(category.getAuditableProperties().updatedBy()).isEqualTo(username);
+                    assertThat(category.getAuditableProperties().updatedAt()).isNotNull();
+                });
     }
 
     @Test
     @DisplayName("Should register a product with a category")
     void shouldRegisterAProductWithACategory() throws Exception {
         // Given
-        String food = "Food";
-        Map<String, Object> createFoodCategory = Map.of("name", food);
-        Cookie jwtToken = jwtToken(username);
-        MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/categories")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken)
-                        .content(serializeRequestToJson(createFoodCategory))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").isNotEmpty())
-                .andReturn();
-        Integer categoryId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        Category category = catalogFixtures.category1();
         String pizza = "Pizza";
-        Map<String, Object> registerPizza = Map.of("name", pizza, "categoryId", categoryId);
+        Map<String, Object> registerPizza = Map.of("name", pizza, "categoryId", category.getId());
+        Cookie jwtToken = jwtToken(username);
         // When
-        mvcResult = mockMvc.perform(post("/catalog/v1/products")
+        MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
                         .cookie(jwtToken)
@@ -176,12 +149,10 @@ class CatalogTest extends AbstractIt {
                 .andReturn();
         // Then
         Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
-        var productRow = jdbcClient.sql("SELECT * FROM products WHERE id = :id")
-                .param("id", id)
-                .query(rowMapper)
-                .single();
-        assertThat(productRow.get("name")).hasToString(pizza);
-        assertThat(productRow).containsEntry("category_id", categoryId);
+        assertThat(catalogContext.productRepository.findById(ProductId.of(id.longValue()))
+                .orElseThrow())
+                .extracting("name", "categoryId")
+                .containsExactly(pizza, category.getId());
     }
 
     @Test

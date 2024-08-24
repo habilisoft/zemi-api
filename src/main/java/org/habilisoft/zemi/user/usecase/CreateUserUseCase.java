@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.shared.UseCase;
 import org.habilisoft.zemi.user.Username;
 import org.habilisoft.zemi.user.domain.*;
-import org.habilisoft.zemi.user.domain.Exceptions;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +14,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
-public class CreateUserUseCase implements UseCase<Commands.CreateUser, Void> {
+public class CreateUserUseCase implements UseCase<UserCommands.CreateUser, Void> {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Void execute(Commands.CreateUser createUser) {
+    public Void execute(UserCommands.CreateUser createUser) {
         userRepository.findById(createUser.username())
                 .ifPresent(_ -> {
                     throw new Exceptions.UserAlreadyExists(createUser.username());

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.user.UserService;
 import org.habilisoft.zemi.user.Username;
 import org.habilisoft.zemi.user.domain.User;
-import org.habilisoft.zemi.user.usecase.Commands;
+import org.habilisoft.zemi.user.usecase.UserCommands;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,7 +28,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @RolesAllowed({"admin", "auth:user:create"})
     public void createUser(@Valid @RequestBody Requests.CreateUser request) {
-        Commands.CreateUser command = new Commands.CreateUser(
+        UserCommands.CreateUser command = new UserCommands.CreateUser(
                 request.username(),
                 request.name(),
                 request.password(),
@@ -64,7 +64,7 @@ public class UserController {
     @PostMapping("/change-password")
     @ResponseStatus(HttpStatus.OK)
     public void changePassword(@Valid @RequestBody Requests.ChangePassword request) {
-        Commands.ChangePassword command = new Commands.ChangePassword(
+        UserCommands.ChangePassword command = new UserCommands.ChangePassword(
                 Username.of(userService.getCurrentUser()),
                 request.currentPassword(),
                 request.newPassword(),
@@ -78,7 +78,7 @@ public class UserController {
     @PostMapping("/reset-password")
     @ResponseStatus(HttpStatus.OK)
     public void resetPassword(@Valid @RequestBody Requests.ResetPassword request) {
-        Commands.ResetPassword command = new Commands.ResetPassword(
+        UserCommands.ResetPassword command = new UserCommands.ResetPassword(
                 request.username(),
                 request.password(),
                 request.changePasswordAtNextLogin(),
@@ -95,7 +95,7 @@ public class UserController {
     public void addRoleToUser(@PathVariable Username username,
                               @Valid @RequestBody Requests.AddRolesToUser request) {
         userService.addRolesToUser(
-                new Commands.AddRolesToUser(
+                new UserCommands.AddRolesToUser(
                         username,
                         request.roles(),
                         userService.getCurrentUser(),
@@ -110,7 +110,7 @@ public class UserController {
     public void removeRolesFromUser(@PathVariable Username username,
                                     @Valid @RequestBody Requests.RemoveRolesFromUser request) {
         userService.removeRoleFromUser(
-                new Commands.RemoveRolesFromUser(
+                new UserCommands.RemoveRolesFromUser(
                         username,
                         request.roles(),
                         userService.getCurrentUser(),
@@ -124,7 +124,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteUser(@PathVariable Username username) {
         userService.deleteUser(
-                new Commands.DeleteUser(
+                new UserCommands.DeleteUser(
                         username,
                         userService.getCurrentUser(),
                         LocalDateTime.now()

@@ -3,11 +3,7 @@ package org.habilisoft.zemi.user.usecase;
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.shared.UseCase;
 import org.habilisoft.zemi.user.Username;
-import org.habilisoft.zemi.user.domain.PermissionName;
-import org.habilisoft.zemi.user.domain.Role;
-import org.habilisoft.zemi.user.domain.RoleName;
-import org.habilisoft.zemi.user.domain.RoleRepository;
-import org.habilisoft.zemi.user.domain.Exceptions;
+import org.habilisoft.zemi.user.domain.*;
 import org.habilisoft.zemi.user.service.PermissionService;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +12,12 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class CreateRoleUseCase implements UseCase<Commands.CreateRole, Void> {
+public class CreateRoleUseCase implements UseCase<UserCommands.CreateRole, Void> {
     private final RoleRepository roleRepository;
     private final PermissionService permissionService;
 
     @Override
-    public Void execute(Commands.CreateRole createRole) {
+    public Void execute(UserCommands.CreateRole createRole) {
         RoleName roleName = createRole.name();
         String description = createRole.description();
         Set<PermissionName> permissions = createRole.permissions();

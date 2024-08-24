@@ -3,7 +3,14 @@ package org.habilisoft.zemi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.habilisoft.zemi.catalog.CatalogService;
+import org.habilisoft.zemi.catalog.category.domain.Category;
+import org.habilisoft.zemi.catalog.category.domain.CategoryRepository;
+import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
+import org.habilisoft.zemi.catalog.product.domain.Product;
+import org.habilisoft.zemi.catalog.product.domain.ProductRepository;
 import org.habilisoft.zemi.tenant.TenantId;
 import org.habilisoft.zemi.tenant.TenantService;
 import org.habilisoft.zemi.tenant.infra.TenantContext;
@@ -14,7 +21,8 @@ import org.habilisoft.zemi.user.domain.RoleRepository;
 import org.habilisoft.zemi.user.jwt.AuthConstants;
 import org.habilisoft.zemi.user.jwt.JwtRequest;
 import org.habilisoft.zemi.user.jwt.JwtService;
-import org.habilisoft.zemi.user.usecase.Commands;
+import org.habilisoft.zemi.user.usecase.UserCommands;
+import org.habilisoft.zemi.util.Commands;
 import org.habilisoft.zemi.util.Requests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +36,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -40,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(ClearDatabase.class)
 @SpringBootTest(properties = "spring.flyway.clean-disabled=false")
-@Import({TestcontainersConfiguration.class, TenantConfiguration.class})
+@Import({TestcontainersConfiguration.class, TenantConfiguration.class, AbstractIt.Context.class})
 public abstract class AbstractIt {
     @Autowired
     protected JdbcClient jdbcClient;
@@ -51,13 +60,13 @@ public abstract class AbstractIt {
     @Autowired
     protected JwtService jwtService;
     @Autowired
-    protected CatalogService catalogService;
+    protected Context.CatalogContext catalogContext;
     @Autowired
-    private UserService userService;
-    @Autowired
-    private RoleRepository roleRepository;
+    protected Context.UserContext userContext;
+
     @Autowired
     private TenantContext tenantContext;
+    protected CatalogFixtures catalogFixtures = new CatalogFixtures();
     protected ColumnMapRowMapper rowMapper = new ColumnMapRowMapper();
 
     protected final String tenantHeader = "TenantID";
@@ -75,21 +84,42 @@ public abstract class AbstractIt {
         }
     }
 
+    @TestConfiguration
+    protected static class Context {
+        @Component
+        public static class CatalogContext {
+            @Autowired
+            public CatalogService catalogService;
+            @Autowired
+            public ProductRepository productRepository;
+            @Autowired
+            public CategoryRepository categoryRepository;
+        }
+
+        @Component
+        protected static class UserContext {
+            @Autowired
+            private UserService userService;
+            @Autowired
+            private RoleRepository roleRepository;
+        }
+    }
+
     @BeforeEach
     void setUp() {
         tenantContext.set(tenant);
-        Commands.CreateRole createAdminRole = org.habilisoft.zemi.util.Commands.Users.adminRole().build();
+        UserCommands.CreateRole createAdminRole = Commands.Users.adminRole().build();
         RoleName roleName = createAdminRole.name();
-        if (!roleRepository.existsById(roleName)) {
-            userService.createRole(createAdminRole);
+        if (!userContext.roleRepository.existsById(roleName)) {
+            userContext.userService.createRole(createAdminRole);
         }
-        Commands.CreateUser createUser = org.habilisoft.zemi.util.Commands.Users.createUserBuilder()
+        UserCommands.CreateUser createUser = Commands.Users.createUserBuilder()
                 .username(username)
                 .name("Test User")
                 .roles(Set.of(roleName))
                 .password("password")
                 .build();
-        userService.createUser(createUser);
+        userContext.userService.createUser(createUser);
     }
 
     protected String serializeRequestToJson(Object object) throws JsonProcessingException {
@@ -109,5 +139,29 @@ public abstract class AbstractIt {
                 .andExpect(status().isOk())
                 .andReturn();
         return mvcResult.getResponse().getCookie(AuthConstants.COOKIE_ACCESS_TOKEN_NAME);
+    }
+
+
+    @Accessors(fluent = true)
+    protected class CatalogFixtures {
+        @Getter(lazy = true)
+        private final Product product1 = product();
+        @Getter(lazy = true)
+        private final Category category1 = category();
+
+        protected Product product() {
+            RegisterProduct createProduct = Commands.Catalog.registerProductBuilder()
+                    .name("Pizza").build();
+
+            return catalogContext.productRepository.findById(catalogContext.catalogService.registerProduct(createProduct))
+                    .orElseThrow();
+        }
+
+        protected Category category() {
+            Commands.Catalog.CreateCategoryBuilder createCategory = Commands.Catalog.createCategoryBuilder()
+                    .name("Food");
+            return catalogContext.categoryRepository.findById(catalogContext.catalogService.createCategory(createCategory.build()))
+                    .orElseThrow();
+        }
     }
 }
