@@ -96,7 +96,7 @@ public abstract class AbstractIt {
         return objectMapper.writeValueAsString(object);
     }
 
-    protected Cookie jwtToken() throws Exception {
+    protected Cookie jwtToken(Username username) throws Exception {
         JwtRequest loginRequest = Requests.Users.loginBuilder()
                 .username(username.value())
                 .password("password")
