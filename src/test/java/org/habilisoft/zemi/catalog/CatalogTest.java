@@ -149,10 +149,12 @@ class CatalogTest extends AbstractIt {
                 .andReturn();
         // Then
         Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
-        assertThat(catalogContext.productRepository.findById(ProductId.of(id.longValue()))
-                .orElseThrow())
-                .extracting("name", "categoryId")
-                .containsExactly(pizza, category.getId());
+        assertThat(catalogContext.productRepository.findById(ProductId.of(id.longValue())))
+                .isPresent()
+                .hasValueSatisfying(product -> {
+                    assertThat(product.getName()).isEqualTo(pizza);
+                    assertThat(product.getCategoryId()).isEqualTo(category.getId());
+                });
     }
 
     @Test
