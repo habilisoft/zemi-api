@@ -11,6 +11,8 @@ import org.habilisoft.zemi.catalog.category.domain.CategoryRepository;
 import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
 import org.habilisoft.zemi.catalog.product.domain.Product;
 import org.habilisoft.zemi.catalog.product.domain.ProductRepository;
+import org.habilisoft.zemi.sales.SalesService;
+import org.habilisoft.zemi.sales.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.tenant.TenantId;
 import org.habilisoft.zemi.tenant.TenantService;
 import org.habilisoft.zemi.tenant.infra.TenantContext;
@@ -63,6 +65,8 @@ public abstract class AbstractIt {
     protected Context.CatalogContext catalogContext;
     @Autowired
     protected Context.UserContext userContext;
+    @Autowired
+    protected Context.SalesContext salesContext;
 
     @Autowired
     private TenantContext tenantContext;
@@ -102,6 +106,14 @@ public abstract class AbstractIt {
             private UserService userService;
             @Autowired
             private RoleRepository roleRepository;
+        }
+
+        @Component
+        public static class SalesContext {
+            @Autowired
+            public SalesService salesService;
+            @Autowired
+            public CustomerRepository customerRepository;
         }
     }
 

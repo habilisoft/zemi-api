@@ -2,6 +2,7 @@ package org.habilisoft.zemi.sales;
 
 import com.jayway.jsonpath.JsonPath;
 import org.habilisoft.zemi.AbstractIt;
+import org.habilisoft.zemi.sales.customer.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -9,8 +10,11 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,22 +51,19 @@ class SalesTest extends AbstractIt {
                 .andReturn();
         // Then
         Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
-        var customerRow = jdbcClient.sql("""
-                        SELECT * 
-                        FROM customers c
-                        join business_entity_addresses bea on c.id = bea.business_entity_id
-                        join business_entity_phones bep on c.id = bep.business_entity_id
-                        WHERE id = :id
-                        """)
-                .param("id", id)
-                .query(rowMapper)
-                .list();
-        assertThat(customerRow).first().extracting("name").isEqualTo(johnDoe);
-        assertThat(customerRow).first().extracting("type").isEqualTo("PERSON");
-        assertThat(customerRow).first().extracting("email").isEqualTo("jhon@zemi.com");
-        assertThat(customerRow).first().extracting("street").isEqualTo("Calle 1");
-        assertThat(customerRow).first().extracting("city").isEqualTo("Santo Domingo");
-        assertThat(customerRow).first().extracting("zip_code").isEqualTo("10101");
-        assertThat(customerRow).extracting("phone").contains("809-555-5555", "809-555-5556");
+        assertThat(salesContext.customerRepository.findById(CustomerId.of(id.longValue())))
+                .isPresent()
+                .hasValueSatisfying(customer -> {
+                    assertThat(customer.getName()).isEqualTo(johnDoe);
+                    assertThat(customer.getType()).isEqualTo(CustomerType.PERSON);
+                    assertThat(customer.getContact()).isEqualTo(
+                            Contact.of(
+                                    Stream.of("809-555-5555", "809-555-5556").map(PhoneNumber::of).collect(Collectors.toSet()),
+                                    EmailAddress.of("jhon@zemi.com"))
+                    );
+                    assertThat(customer.getAddress()).isEqualTo(
+                            Set.of(Address.of("Calle 1", "Santo Domingo", "10101"))
+                    );
+                });
     }
 }

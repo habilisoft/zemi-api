@@ -22,11 +22,11 @@ public class Customer extends AbstractAggregateRoot<Customer> implements Persist
     private String name;
     @Enumerated(EnumType.STRING)
     private CustomerType type;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_entity_addresses", joinColumns = @JoinColumn(name = "business_entity_id"))
     private Set<Address> address;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.PRIVATE)
     @AttributeOverride(name = "value", column = @Column(name = "phone"))
@@ -79,5 +79,9 @@ public class Customer extends AbstractAggregateRoot<Customer> implements Persist
     }
     public void changeNcfType(NcfType ncfType) {
         registerEvent(new CustomerNcfTypeChanged(id, ncfType));
+    }
+
+    public Contact getContact() {
+        return Contact.of(phoneNumbers, emailAddress);
     }
 }
