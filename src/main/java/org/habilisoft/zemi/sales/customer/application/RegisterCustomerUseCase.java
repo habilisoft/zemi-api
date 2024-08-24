@@ -30,8 +30,6 @@ public class RegisterCustomerUseCase implements UseCase<RegisterCustomer, Custom
                 createdAt,
                 createdBy
         );
-        registerCustomer.creditLimit().ifPresent(customer::changeCreditLimit);
-        registerCustomer.ncfType().ifPresent(customer::changeNcfType);
         customerRepository.save(customer);
         return customerId;
     }

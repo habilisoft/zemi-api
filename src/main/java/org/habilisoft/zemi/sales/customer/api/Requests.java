@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.habilisoft.zemi.sales.customer.domain.*;
 import org.habilisoft.zemi.shared.MonetaryAmount;
+import org.habilisoft.zemi.taxesmanagement.NcfType;
 
 import java.util.Optional;
 import java.util.Set;

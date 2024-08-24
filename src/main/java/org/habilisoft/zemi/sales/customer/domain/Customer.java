@@ -2,7 +2,6 @@ package org.habilisoft.zemi.sales.customer.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.user.AuditableProperties;
 import org.habilisoft.zemi.user.Username;
 import org.springframework.data.domain.AbstractAggregateRoot;
@@ -72,13 +71,6 @@ public class Customer extends AbstractAggregateRoot<Customer> implements Persist
         this.emailAddress = newContact.emailAddress();
         this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);
         registerEvent(new CustomerContactChanged(id, newContact));
-    }
-
-    public void changeCreditLimit(MonetaryAmount creditLimit) {
-        registerEvent(new CustomerCreditLimitUpdated(id, creditLimit));
-    }
-    public void changeNcfType(NcfType ncfType) {
-        registerEvent(new CustomerNcfTypeChanged(id, ncfType));
     }
 
     public Contact getContact() {
