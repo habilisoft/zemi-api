@@ -1,6 +1,7 @@
 package org.habilisoft.zemi.catalog;
 
 import com.jayway.jsonpath.JsonPath;
+import jakarta.servlet.http.Cookie;
 import org.habilisoft.zemi.AbstractIt;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DisplayName("Product Service Test")
+@DisplayName("Catalog Test")
 class CatalogTest extends AbstractIt {
     @Test
     @DisplayName("Should register a product")
@@ -26,7 +27,7 @@ class CatalogTest extends AbstractIt {
         MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken())
+                        .cookie(jwtToken(username))
                         .content(serializeRequestToJson(registerPizza))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -39,6 +40,45 @@ class CatalogTest extends AbstractIt {
                 .query(rowMapper)
                 .single();
         assertThat(productRow.get("name")).hasToString(pizza);
+        assertThat(productRow.get("created_at")).isNotNull();
+        assertThat(productRow.get("created_by")).hasToString(username.value());
+    }
+
+    @Test
+    @DisplayName("Should update a product")
+    void shouldUpdateAProduct() throws Exception {
+        // Given
+        String pizza = "Pizza";
+        Map<String, Object> registerPizza = Map.of("name", pizza);
+        Cookie jwtToken = jwtToken(username);
+        MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(tenantHeader, tenant.name())
+                        .cookie(jwtToken)
+                        .content(serializeRequestToJson(registerPizza))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andReturn();
+        Integer productId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        String burger = "Burger";
+        Map<String, Object> updateBurgerProduct = Map.of("name", burger);
+        // When
+        mockMvc.perform(post("/catalog/v1/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(tenantHeader, tenant.name())
+                        .cookie(jwtToken)
+                        .content(serializeRequestToJson(updateBurgerProduct))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        // Then
+        var productRow = jdbcClient.sql("SELECT * FROM products WHERE id = :id")
+                .param("id", productId)
+                .query(rowMapper)
+                .single();
+        assertThat(productRow.get("name")).hasToString(burger);
+        assertThat(productRow.get("updated_at")).isNotNull();
+        assertThat(productRow.get("updated_by")).hasToString(username.value());
     }
 
     @Test
@@ -51,7 +91,7 @@ class CatalogTest extends AbstractIt {
         MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken())
+                        .cookie(jwtToken(username))
                         .content(serializeRequestToJson(createFoodCategory))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -64,6 +104,45 @@ class CatalogTest extends AbstractIt {
                 .query(rowMapper)
                 .single();
         assertThat(categoryRow.get("name")).hasToString(food);
+        assertThat(categoryRow.get("created_at")).isNotNull();
+        assertThat(categoryRow.get("created_by")).hasToString(username.value());
+    }
+
+    @Test
+    @DisplayName("Should update a category")
+    void shouldUpdateACategory() throws Exception {
+        // Given
+        String food = "Food";
+        Map<String, Object> createFoodCategory = Map.of("name", food);
+        Cookie jwtToken = jwtToken(username);
+        MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(tenantHeader, tenant.name())
+                        .cookie(jwtToken)
+                        .content(serializeRequestToJson(createFoodCategory))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andReturn();
+        Integer categoryId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+        String fastFood = "Fast Food";
+        Map<String, Object> updateFastFoodCategory = Map.of("name", fastFood);
+        // When
+        mockMvc.perform(post("/catalog/v1/categories/{id}", categoryId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(tenantHeader, tenant.name())
+                        .cookie(jwtToken)
+                        .content(serializeRequestToJson(updateFastFoodCategory))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        // Then
+        var categoryRow = jdbcClient.sql("SELECT * FROM categories WHERE id = :id")
+                .param("id", categoryId)
+                .query(rowMapper)
+                .single();
+        assertThat(categoryRow.get("name")).hasToString(fastFood);
+        assertThat(categoryRow.get("updated_at")).isNotNull();
+        assertThat(categoryRow.get("updated_by")).hasToString(username.value());
     }
 
     @Test
@@ -72,10 +151,11 @@ class CatalogTest extends AbstractIt {
         // Given
         String food = "Food";
         Map<String, Object> createFoodCategory = Map.of("name", food);
+        Cookie jwtToken = jwtToken(username);
         MvcResult mvcResult = mockMvc.perform(post("/catalog/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken())
+                        .cookie(jwtToken)
                         .content(serializeRequestToJson(createFoodCategory))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -88,7 +168,7 @@ class CatalogTest extends AbstractIt {
         mvcResult = mockMvc.perform(post("/catalog/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken())
+                        .cookie(jwtToken)
                         .content(serializeRequestToJson(registerPizza))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -114,7 +194,7 @@ class CatalogTest extends AbstractIt {
         mockMvc.perform(post("/catalog/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(tenantHeader, tenant.name())
-                        .cookie(jwtToken())
+                        .cookie(jwtToken(username))
                         .content(serializeRequestToJson(registerPizza))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())

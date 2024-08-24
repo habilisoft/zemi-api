@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 @RequiredArgsConstructor
-public class TransactionalIdGenerator implements IdGenerator {
+public class TransactionalIdGenerator {
     private final JdbcClient jdbcClient;
 
     public TransactionalId generate(DocumentId documentId) {

@@ -1,25 +1,17 @@
 package org.habilisoft.zemi.company.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
-import java.io.Serializable;
-
-@Builder
+@Data
 @Entity
-@Getter @Setter
-@Table(name = "company_information")
-@AllArgsConstructor
 @NoArgsConstructor
-public class CompanyInformation implements Serializable {
+@EqualsAndHashCode(of = "id")
+@Table(name = "company_information")
+public class CompanyInformation extends AbstractAggregateRoot<CompanyInformation> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
