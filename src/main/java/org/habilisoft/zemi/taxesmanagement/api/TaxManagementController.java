@@ -3,7 +3,7 @@ package org.habilisoft.zemi.taxesmanagement.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
 import org.habilisoft.zemi.taxesmanagement.application.ChangeCustomerNcfType;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;

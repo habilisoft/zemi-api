@@ -3,7 +3,7 @@ package org.habilisoft.zemi.accountreceivables.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.user.AuditableProperties;
 import org.habilisoft.zemi.user.Username;

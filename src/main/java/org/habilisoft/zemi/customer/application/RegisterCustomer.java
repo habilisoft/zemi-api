@@ -1,8 +1,8 @@
-package org.habilisoft.zemi.sales.customer.application;
+package org.habilisoft.zemi.customer.application;
 
-import org.habilisoft.zemi.sales.customer.domain.Address;
-import org.habilisoft.zemi.sales.customer.domain.Contact;
-import org.habilisoft.zemi.sales.customer.domain.CustomerType;
+import org.habilisoft.zemi.customer.domain.Address;
+import org.habilisoft.zemi.customer.domain.Contact;
+import org.habilisoft.zemi.customer.domain.CustomerType;
 import org.habilisoft.zemi.shared.Command;
 
 import java.time.LocalDateTime;

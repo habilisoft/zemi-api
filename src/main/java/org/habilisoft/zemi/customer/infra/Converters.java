@@ -1,4 +1,4 @@
-package org.habilisoft.zemi.sales.customer.infra;
+package org.habilisoft.zemi.customer.infra;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
-import org.habilisoft.zemi.sales.customer.domain.CustomerType;
-import org.habilisoft.zemi.sales.customer.domain.EmailAddress;
-import org.habilisoft.zemi.sales.customer.domain.PhoneNumber;
+import org.habilisoft.zemi.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.CustomerType;
+import org.habilisoft.zemi.customer.domain.EmailAddress;
+import org.habilisoft.zemi.customer.domain.PhoneNumber;
 import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;

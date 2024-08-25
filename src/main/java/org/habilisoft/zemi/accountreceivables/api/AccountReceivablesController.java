@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.accountreceivables.AccountReceivablesService;
 import org.habilisoft.zemi.accountreceivables.application.ChangeCustomerCreditLimit;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.user.UserService;
 import org.springframework.http.HttpStatus;

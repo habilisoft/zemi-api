@@ -5,9 +5,10 @@ import jakarta.servlet.http.Cookie;
 import org.habilisoft.zemi.AbstractIt;
 import org.habilisoft.zemi.catalog.product.domain.Product;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
-import org.habilisoft.zemi.sales.customer.domain.Customer;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.Customer;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.taxesmanagement.ncf.NcfType;
+import org.habilisoft.zemi.taxesmanagement.product.domain.TaxIdAndRate;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.Tax;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
 import org.habilisoft.zemi.util.Commands;
@@ -30,7 +31,7 @@ class TaxManagementTest extends AbstractIt {
     @DisplayName("Should change the customer ncf type")
     void shouldChangeTheCustomerNcfType() throws Exception {
         // Given
-        Customer johnDoe = salesFixtures.customer1();
+        Customer johnDoe = customerFixtures.customer1();
         CustomerId customerId = johnDoe.getId();
         Cookie jwtToken = jwtToken(username);
         Map<String, Object> fiscalCredit = Map.of(
@@ -130,7 +131,7 @@ class TaxManagementTest extends AbstractIt {
                 .andExpect(status().isNoContent());
         // Then
         assertThat(taxManagementContext.taxManagementService.getProductTaxes(Set.of(productId)))
-                .containsEntry(productId, Set.of(tax18Percent.getRate()));
+                .containsEntry(productId, Set.of(TaxIdAndRate.from(tax18Percent)));
     }
 
     @Test

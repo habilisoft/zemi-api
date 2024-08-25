@@ -5,7 +5,7 @@ import org.habilisoft.zemi.accountreceivables.application.ChangeCustomerCreditLi
 import org.habilisoft.zemi.accountreceivables.application.ChangeCustomerCreditLimitUseCase;
 import org.habilisoft.zemi.accountreceivables.application.InitializeCustomerAr;
 import org.habilisoft.zemi.accountreceivables.application.InitializeCustomerArUseCase;
-import org.habilisoft.zemi.sales.customer.domain.CustomerRegistered;
+import org.habilisoft.zemi.customer.domain.CustomerRegistered;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 

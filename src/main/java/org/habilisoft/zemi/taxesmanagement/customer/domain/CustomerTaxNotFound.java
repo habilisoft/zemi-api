@@ -1,7 +1,7 @@
 package org.habilisoft.zemi.taxesmanagement.customer.domain;
 
 import lombok.Getter;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.shared.DomainException;
 @Getter
 public final class CustomerTaxNotFound extends DomainException {

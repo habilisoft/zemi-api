@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.catalog.CatalogService;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.catalog.product.domain.ProductNotFound;
+import org.habilisoft.zemi.customer.CustomerService;
+import org.habilisoft.zemi.customer.domain.CustomerNotFound;
 import org.habilisoft.zemi.pricemanagement.PriceManagementService;
-import org.habilisoft.zemi.sales.customer.domain.CustomerNotFound;
-import org.habilisoft.zemi.sales.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.sales.sale.domain.Sale;
 import org.habilisoft.zemi.sales.sale.domain.SaleProduct;
 import org.habilisoft.zemi.sales.sale.domain.SaleRepository;
@@ -15,7 +15,7 @@ import org.habilisoft.zemi.shared.TransactionalId;
 import org.habilisoft.zemi.shared.TransactionalIdGenerator;
 import org.habilisoft.zemi.shared.UseCase;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
-import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxRate;
+import org.habilisoft.zemi.taxesmanagement.product.domain.TaxIdAndRate;
 import org.habilisoft.zemi.user.Username;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MakeSaleUseCase implements UseCase<MakeSale, TransactionalId> {
     private final SaleRepository saleRepository;
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
     private final TransactionalIdGenerator transactionalIdGenerator;
     private final CatalogService catalogService;
     private final TaxManagementService taxManagementService;
@@ -40,11 +40,10 @@ public class MakeSaleUseCase implements UseCase<MakeSale, TransactionalId> {
     @Transactional
     public TransactionalId execute(MakeSale makeSale) {
         TransactionalId transactionalId = transactionalIdGenerator.generate(makeSale.documentId());
-        makeSale.customerId().filter(customerId -> {
-            if (customerRepository.existsById(customerId)) {
-                return true;
+        makeSale.customerId().ifPresent(customerId -> {
+            if (!customerService.exists(customerId)) {
+                throw new CustomerNotFound(customerId);
             }
-            throw new CustomerNotFound(customerId);
         });
         Set<ProductId> productIds = makeSale.products().stream().map(MakeSale.Product::productId).collect(Collectors.toSet());
         Map<ProductId, Boolean> existenceMap = catalogService.productExists(productIds);
@@ -52,11 +51,11 @@ public class MakeSaleUseCase implements UseCase<MakeSale, TransactionalId> {
             throw new ProductNotFound(entry.getKey());
         });
         Map<ProductId, MonetaryAmount> productPrices = priceManagementService.getCurrentPrice(productIds);
-        Map<ProductId, Set<TaxRate>> productTaxes = taxManagementService.getProductTaxes(productIds);
+        Map<ProductId, Set<TaxIdAndRate>> productTaxes = taxManagementService.getProductTaxes(productIds);
         Set<SaleProduct> products = makeSale.products().stream()
                 .map(product -> {
                     MonetaryAmount price = productPrices.getOrDefault(product.productId(), MonetaryAmount.ZERO);
-                    Set<TaxRate> taxRates = productTaxes.get(product.productId());
+                    Set<TaxIdAndRate> taxRates = productTaxes.get(product.productId());
                     return SaleProduct.of(transactionalId, product.productId(), product.quantity(), price, taxRates);
                 })
                 .collect(Collectors.toSet());

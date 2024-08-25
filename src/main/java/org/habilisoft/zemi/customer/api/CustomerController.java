@@ -1,10 +1,10 @@
-package org.habilisoft.zemi.sales.customer.api;
+package org.habilisoft.zemi.customer.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.habilisoft.zemi.sales.SalesService;
-import org.habilisoft.zemi.sales.customer.application.RegisterCustomer;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.CustomerService;
+import org.habilisoft.zemi.customer.application.RegisterCustomer;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +14,15 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("sales/v1")
-public class SalesController {
-    private final SalesService salesService;
+@RequestMapping("customers/v1")
+public class CustomerController {
+    private final CustomerService customerService;
     private final UserService userService;
 
-    @PostMapping("/customer")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> registerCustomer(@RequestBody @Valid Requests.RegisterCustomer registerCustomer) {
-        CustomerId customerId = salesService.registerCustomer(
+        CustomerId customerId = customerService.registerCustomer(
                 new RegisterCustomer(
                         registerCustomer.name(),
                         registerCustomer.type(),

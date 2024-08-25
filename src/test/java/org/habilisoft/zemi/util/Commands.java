@@ -6,10 +6,12 @@ import org.habilisoft.zemi.catalog.category.application.CreateCategory;
 import org.habilisoft.zemi.catalog.category.domain.CategoryId;
 import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
-import org.habilisoft.zemi.sales.customer.application.RegisterCustomer;
-import org.habilisoft.zemi.sales.customer.domain.Address;
-import org.habilisoft.zemi.sales.customer.domain.Contact;
-import org.habilisoft.zemi.sales.customer.domain.CustomerType;
+import org.habilisoft.zemi.customer.application.RegisterCustomer;
+import org.habilisoft.zemi.customer.domain.Address;
+import org.habilisoft.zemi.customer.domain.Contact;
+import org.habilisoft.zemi.customer.domain.CustomerType;
+import org.habilisoft.zemi.pricemanagement.application.ChangeProductPrice;
+import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
@@ -20,6 +22,7 @@ import org.habilisoft.zemi.user.domain.RoleName;
 import org.habilisoft.zemi.user.usecase.UserCommands;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -113,6 +116,16 @@ public class Commands {
         public static AddProductTaxes addProductTaxes(ProductId productId, Set<TaxId> taxes, String user, LocalDateTime time) {
             return new AddProductTaxes(productId,
                     taxes, Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+    }
+
+    public class PriceManagement {
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "changeProductPriceBuilder")
+        public static ChangeProductPrice changeProductPrice(ProductId productId, double price, String user, LocalDateTime time) {
+            return new ChangeProductPrice(productId,
+                    MonetaryAmount.of(new BigDecimal(price)),
+                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
         }
     }
 }

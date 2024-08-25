@@ -1,8 +1,8 @@
-package org.habilisoft.zemi.sales.customer.api;
+package org.habilisoft.zemi.customer.api;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.habilisoft.zemi.sales.customer.domain.*;
+import org.habilisoft.zemi.customer.domain.*;
 
 import java.util.Set;
 

@@ -1,4 +1,4 @@
-package org.habilisoft.zemi.sales.customer.domain;
+package org.habilisoft.zemi.customer.domain;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -2,8 +2,8 @@ package org.habilisoft.zemi.accountreceivable;
 
 import jakarta.servlet.http.Cookie;
 import org.habilisoft.zemi.AbstractIt;
-import org.habilisoft.zemi.sales.customer.domain.Customer;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.Customer;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class AccountReceivableTest extends AbstractIt {
     @DisplayName("Should change the customer credit limit")
     void shouldChangeTheCustomerCreditLimit() throws Exception{
         // Given
-        Customer customer = salesFixtures.customer1();
+        Customer customer = customerFixtures.customer1();
         CustomerId customerId = customer.getId();
         Cookie jwtToken = jwtToken(username);
         Map<String, Object> oneThousand = Map.of(

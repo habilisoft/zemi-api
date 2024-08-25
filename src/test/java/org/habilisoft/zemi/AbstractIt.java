@@ -13,13 +13,15 @@ import org.habilisoft.zemi.catalog.category.domain.CategoryRepository;
 import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
 import org.habilisoft.zemi.catalog.product.domain.Product;
 import org.habilisoft.zemi.catalog.product.domain.ProductRepository;
+import org.habilisoft.zemi.customer.CustomerService;
+import org.habilisoft.zemi.customer.application.RegisterCustomer;
+import org.habilisoft.zemi.customer.domain.Customer;
+import org.habilisoft.zemi.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.pricemanagement.PriceManagementService;
 import org.habilisoft.zemi.pricemanagement.domain.ProductPriceRepository;
 import org.habilisoft.zemi.sales.SalesService;
-import org.habilisoft.zemi.sales.customer.application.RegisterCustomer;
-import org.habilisoft.zemi.sales.customer.domain.Customer;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
-import org.habilisoft.zemi.sales.customer.domain.CustomerRepository;
+import org.habilisoft.zemi.sales.sale.domain.SaleRepository;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
 import org.habilisoft.zemi.taxesmanagement.customer.domain.CustomerTaxRepository;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
@@ -58,7 +60,6 @@ import java.util.Set;
 import static org.habilisoft.zemi.AbstractIt.TenantConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @AutoConfigureMockMvc
 @ExtendWith(ClearDatabase.class)
@@ -80,6 +81,8 @@ public abstract class AbstractIt {
     @Autowired
     protected Context.SalesContext salesContext;
     @Autowired
+    protected Context.CustomerContext customerContext;
+    @Autowired
     protected Context.TaxManagementContext taxManagementContext;
     @Autowired
     protected Context.AccountReceivableContext accountReceivableContext;
@@ -89,7 +92,7 @@ public abstract class AbstractIt {
     @Autowired
     private TenantContext tenantContext;
     protected CatalogFixtures catalogFixtures = new CatalogFixtures();
-    protected SalesFixtures salesFixtures = new SalesFixtures();
+    protected CustomerFixtures customerFixtures = new CustomerFixtures();
     protected TaxManagementFixtures taxManagementFixtures = new TaxManagementFixtures();
 
     protected final String tenantHeader = "TenantID";
@@ -131,6 +134,13 @@ public abstract class AbstractIt {
         public static class SalesContext {
             @Autowired
             public SalesService salesService;
+            @Autowired
+            public SaleRepository saleRepository;
+        }
+        @Component
+        public static class CustomerContext {
+            @Autowired
+            public CustomerService customerService;
             @Autowired
             public CustomerRepository customerRepository;
         }
@@ -200,13 +210,15 @@ public abstract class AbstractIt {
     @Accessors(fluent = true)
     protected class CatalogFixtures {
         @Getter(lazy = true)
-        private final Product product1 = product();
+        private final Product product1 = product("Pizza");
+        @Getter(lazy = true)
+        private final Product product2 = product("Soda");
         @Getter(lazy = true)
         private final Category category1 = category();
 
-        protected Product product() {
+        protected Product product(String name) {
             RegisterProduct createProduct = Commands.Catalog.registerProductBuilder()
-                    .name("Pizza").build();
+                    .name(name).build();
 
             return catalogContext.productRepository.findById(catalogContext.catalogService.registerProduct(createProduct))
                     .orElseThrow();
@@ -221,7 +233,7 @@ public abstract class AbstractIt {
     }
 
     @Accessors(fluent = true)
-    protected class SalesFixtures {
+    protected class CustomerFixtures {
         @Getter(lazy = true)
         private final Customer customer1 = customer();
 
@@ -229,10 +241,8 @@ public abstract class AbstractIt {
             RegisterCustomer registerCustomer = Commands.Sales.registerCustomerBuilder()
                     .name("John Doe")
                     .build();
-            CustomerId customerId = salesContext.salesService.registerCustomer(registerCustomer);
-            await().until(() -> taxManagementContext.customerTaxRepository.existsById(customerId));
-            await().until(() -> accountReceivableContext.customerArRepository.existsById(customerId));
-            return salesContext.customerRepository.findById(customerId)
+            CustomerId customerId = customerContext.customerService.registerCustomer(registerCustomer);
+            return customerContext.customerRepository.findById(customerId)
                     .orElseThrow();
         }
     }

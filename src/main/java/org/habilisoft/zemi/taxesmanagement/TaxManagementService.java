@@ -2,7 +2,7 @@ package org.habilisoft.zemi.taxesmanagement;
 
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
-import org.habilisoft.zemi.sales.customer.domain.CustomerRegistered;
+import org.habilisoft.zemi.customer.domain.CustomerRegistered;
 import org.habilisoft.zemi.taxesmanagement.application.ChangeCustomerNcfType;
 import org.habilisoft.zemi.taxesmanagement.application.InitializeCustomerTax;
 import org.habilisoft.zemi.taxesmanagement.customer.application.ChangeCustomerNcfTypeUseCase;
@@ -13,12 +13,12 @@ import org.habilisoft.zemi.taxesmanagement.product.application.RemoveProductTaxe
 import org.habilisoft.zemi.taxesmanagement.product.application.RemoveProductTaxesUseCase;
 import org.habilisoft.zemi.taxesmanagement.product.domain.ProductIdAndTax;
 import org.habilisoft.zemi.taxesmanagement.product.domain.ProductTaxRepository;
+import org.habilisoft.zemi.taxesmanagement.product.domain.TaxIdAndRate;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTaxUseCase;
 import org.habilisoft.zemi.taxesmanagement.tax.application.UpdateTax;
 import org.habilisoft.zemi.taxesmanagement.tax.application.UpdateTaxUseCase;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
-import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxRate;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 
@@ -70,9 +70,9 @@ public class TaxManagementService {
         removeProductTaxesUseCase.execute(removeProductTaxes);
     }
 
-    public Map<ProductId, Set<TaxRate>> getProductTaxes(Set<ProductId> productIds) {
+    public Map<ProductId, Set<TaxIdAndRate>> getProductTaxes(Set<ProductId> productIds) {
         return productTaxRepository.findTaxesByProductIds(productIds)
                 .stream()
-                .collect(groupingBy(ProductIdAndTax::getProductId, Collectors.mapping(productIdAndTax -> productIdAndTax.getTax().getRate(), toSet())));
+                .collect(groupingBy(ProductIdAndTax::getProductId, Collectors.mapping(productIdAndTax -> TaxIdAndRate.from(productIdAndTax.getTax()), toSet())));
     }
 }

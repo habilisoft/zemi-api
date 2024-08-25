@@ -1,4 +1,4 @@
-package org.habilisoft.zemi.sales.customer.domain;
+package org.habilisoft.zemi.customer.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

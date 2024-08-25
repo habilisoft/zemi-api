@@ -1,10 +1,10 @@
-package org.habilisoft.zemi.sales.customer.application;
+package org.habilisoft.zemi.customer.application;
 
 import lombok.RequiredArgsConstructor;
-import org.habilisoft.zemi.sales.customer.domain.Customer;
-import org.habilisoft.zemi.sales.customer.domain.CustomerId;
-import org.habilisoft.zemi.sales.customer.domain.CustomerIdGenerator;
-import org.habilisoft.zemi.sales.customer.domain.CustomerRepository;
+import org.habilisoft.zemi.customer.domain.Customer;
+import org.habilisoft.zemi.customer.domain.CustomerId;
+import org.habilisoft.zemi.customer.domain.CustomerIdGenerator;
+import org.habilisoft.zemi.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.shared.UseCase;
 import org.habilisoft.zemi.user.Username;
 import org.springframework.stereotype.Service;

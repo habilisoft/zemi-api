@@ -1,3 +1,3 @@
-package org.habilisoft.zemi.sales.customer.domain;
+package org.habilisoft.zemi.customer.domain;
 
 public record CustomerAddressChanged(CustomerId customerId, Address newAddress) { }

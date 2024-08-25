@@ -10,4 +10,8 @@ public record Quantity(BigDecimal value) {
             throw new IllegalArgumentException("Quantity must be greater than or equal to zero");
         }
     }
+
+    public static Quantity of(BigDecimal value) {
+        return new Quantity(value);
+    }
 }
