@@ -2,7 +2,9 @@ package org.habilisoft.zemi.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 public class TransactionalIdGenerator {
     private final JdbcClient jdbcClient;

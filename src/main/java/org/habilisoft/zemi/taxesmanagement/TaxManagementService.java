@@ -1,19 +1,44 @@
 package org.habilisoft.zemi.taxesmanagement;
 
 import lombok.RequiredArgsConstructor;
+import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.sales.customer.domain.CustomerRegistered;
 import org.habilisoft.zemi.taxesmanagement.application.ChangeCustomerNcfType;
-import org.habilisoft.zemi.taxesmanagement.application.ChangeCustomerNcfTypeUseCase;
 import org.habilisoft.zemi.taxesmanagement.application.InitializeCustomerTax;
-import org.habilisoft.zemi.taxesmanagement.application.InitializeCustomerTaxUseCase;
+import org.habilisoft.zemi.taxesmanagement.customer.application.ChangeCustomerNcfTypeUseCase;
+import org.habilisoft.zemi.taxesmanagement.customer.application.InitializeCustomerTaxUseCase;
+import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
+import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxesUseCase;
+import org.habilisoft.zemi.taxesmanagement.product.application.RemoveProductTaxes;
+import org.habilisoft.zemi.taxesmanagement.product.application.RemoveProductTaxesUseCase;
+import org.habilisoft.zemi.taxesmanagement.product.domain.ProductIdAndTax;
+import org.habilisoft.zemi.taxesmanagement.product.domain.ProductTaxRepository;
+import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
+import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTaxUseCase;
+import org.habilisoft.zemi.taxesmanagement.tax.application.UpdateTax;
+import org.habilisoft.zemi.taxesmanagement.tax.application.UpdateTaxUseCase;
+import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
+import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxRate;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 @RequiredArgsConstructor
 public class TaxManagementService {
     private final InitializeCustomerTaxUseCase initializeCustomerTaxUseCase;
     private final ChangeCustomerNcfTypeUseCase changeCustomerNcfTypeUseCase;
+    private final CreateTaxUseCase createTaxUseCase;
+    private final UpdateTaxUseCase updateTaxUseCase;
+    private final AddProductTaxesUseCase addProductTaxesUseCase;
+    private final RemoveProductTaxesUseCase removeProductTaxesUseCase;
+    private final ProductTaxRepository productTaxRepository;
 
     @ApplicationModuleListener
     void on(CustomerRegistered customerRegistered) {
@@ -27,5 +52,27 @@ public class TaxManagementService {
 
     public void changeCustomerNcfType(ChangeCustomerNcfType changeCustomerNcfType) {
         changeCustomerNcfTypeUseCase.execute(changeCustomerNcfType);
+    }
+
+    public TaxId createTax(CreateTax createTax) {
+        return createTaxUseCase.execute(createTax);
+    }
+
+    public void updateTax(UpdateTax updateTax) {
+        updateTaxUseCase.execute(updateTax);
+    }
+
+    public void addProductTaxes(AddProductTaxes addProductTaxes) {
+        addProductTaxesUseCase.execute(addProductTaxes);
+    }
+
+    public void removeProductTaxes(RemoveProductTaxes removeProductTaxes) {
+        removeProductTaxesUseCase.execute(removeProductTaxes);
+    }
+
+    public Map<ProductId, Set<TaxRate>> getProductTaxes(Set<ProductId> productIds) {
+        return productTaxRepository.findTaxesByProductIds(productIds)
+                .stream()
+                .collect(groupingBy(ProductIdAndTax::getProductId, Collectors.mapping(productIdAndTax -> productIdAndTax.getTax().getRate(), toSet())));
     }
 }

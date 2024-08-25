@@ -5,10 +5,15 @@ import lombok.experimental.UtilityClass;
 import org.habilisoft.zemi.catalog.category.application.CreateCategory;
 import org.habilisoft.zemi.catalog.category.domain.CategoryId;
 import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
+import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.sales.customer.application.RegisterCustomer;
 import org.habilisoft.zemi.sales.customer.domain.Address;
 import org.habilisoft.zemi.sales.customer.domain.Contact;
 import org.habilisoft.zemi.sales.customer.domain.CustomerType;
+import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
+import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
+import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
+import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxRate;
 import org.habilisoft.zemi.user.Username;
 import org.habilisoft.zemi.user.domain.PermissionName;
 import org.habilisoft.zemi.user.domain.RoleName;
@@ -82,13 +87,32 @@ public class Commands {
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "registerCustomerBuilder")
         public static RegisterCustomer registerCustomer(String name,
-                                                      CustomerType type,
-                                                      Contact contact,
-                                                      Address address, String user, LocalDateTime time) {
+                                                        CustomerType type,
+                                                        Contact contact,
+                                                        Address address, String user, LocalDateTime time) {
             return new RegisterCustomer(
                     name, type, contact,
                     Optional.ofNullable(address).orElseGet(() -> Address.of("Fake Street", "Fake City", "00000")),
                     Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+    }
+
+    public class TaxManagement {
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "createTaxBuilder")
+        public static CreateTax registerCustomer(String name,
+                                                 double percentage,
+                                                 String user, LocalDateTime time) {
+            return new CreateTax(
+                    name, TaxRate.fromPercentage(percentage),
+                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "addProductTaxesBuilder")
+        public static AddProductTaxes addProductTaxes(ProductId productId, Set<TaxId> taxes, String user, LocalDateTime time) {
+            return new AddProductTaxes(productId,
+                    taxes, Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
         }
     }
 }

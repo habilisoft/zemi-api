@@ -2,7 +2,7 @@ package org.habilisoft.zemi.taxesmanagement.application;
 
 import org.habilisoft.zemi.sales.customer.domain.CustomerId;
 import org.habilisoft.zemi.shared.Command;
-import org.habilisoft.zemi.taxesmanagement.domain.NcfType;
+import org.habilisoft.zemi.taxesmanagement.ncf.NcfType;
 
 import java.time.LocalDateTime;
 

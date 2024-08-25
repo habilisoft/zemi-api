@@ -2,8 +2,10 @@ package org.habilisoft.zemi.catalog.product.domain;
 
 import lombok.Getter;
 import org.habilisoft.zemi.shared.DomainException;
+import org.springframework.modulith.NamedInterface;
 
 @Getter
+@NamedInterface
 public class ProductNotFound extends DomainException {
     private final ProductId productId;
 

@@ -1,9 +1,10 @@
-package org.habilisoft.zemi.taxesmanagement.application;
+package org.habilisoft.zemi.taxesmanagement.customer.application;
 
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.shared.IdempotentUseCase;
-import org.habilisoft.zemi.taxesmanagement.domain.CustomerTax;
-import org.habilisoft.zemi.taxesmanagement.domain.CustomerTaxRepository;
+import org.habilisoft.zemi.taxesmanagement.application.InitializeCustomerTax;
+import org.habilisoft.zemi.taxesmanagement.customer.domain.CustomerTax;
+import org.habilisoft.zemi.taxesmanagement.customer.domain.CustomerTaxRepository;
 import org.habilisoft.zemi.user.Username;
 import org.springframework.stereotype.Service;
 

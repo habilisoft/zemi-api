@@ -13,13 +13,18 @@ import org.habilisoft.zemi.catalog.category.domain.CategoryRepository;
 import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
 import org.habilisoft.zemi.catalog.product.domain.Product;
 import org.habilisoft.zemi.catalog.product.domain.ProductRepository;
+import org.habilisoft.zemi.pricemanagement.PriceManagementService;
+import org.habilisoft.zemi.pricemanagement.domain.ProductPriceRepository;
 import org.habilisoft.zemi.sales.SalesService;
 import org.habilisoft.zemi.sales.customer.application.RegisterCustomer;
 import org.habilisoft.zemi.sales.customer.domain.Customer;
 import org.habilisoft.zemi.sales.customer.domain.CustomerId;
 import org.habilisoft.zemi.sales.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
-import org.habilisoft.zemi.taxesmanagement.domain.CustomerTaxRepository;
+import org.habilisoft.zemi.taxesmanagement.customer.domain.CustomerTaxRepository;
+import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
+import org.habilisoft.zemi.taxesmanagement.tax.domain.Tax;
+import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxRepository;
 import org.habilisoft.zemi.tenant.TenantId;
 import org.habilisoft.zemi.tenant.TenantService;
 import org.habilisoft.zemi.tenant.infra.TenantContext;
@@ -43,7 +48,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
@@ -79,12 +83,14 @@ public abstract class AbstractIt {
     protected Context.TaxManagementContext taxManagementContext;
     @Autowired
     protected Context.AccountReceivableContext accountReceivableContext;
+    @Autowired
+    protected Context.PriceManagementContext priceManagementContext;
 
     @Autowired
     private TenantContext tenantContext;
     protected CatalogFixtures catalogFixtures = new CatalogFixtures();
     protected SalesFixtures salesFixtures = new SalesFixtures();
-    protected ColumnMapRowMapper rowMapper = new ColumnMapRowMapper();
+    protected TaxManagementFixtures taxManagementFixtures = new TaxManagementFixtures();
 
     protected final String tenantHeader = "TenantID";
     protected static final TenantId tenant = new TenantId("test");
@@ -134,6 +140,8 @@ public abstract class AbstractIt {
             public TaxManagementService taxManagementService;
             @Autowired
             public CustomerTaxRepository customerTaxRepository;
+            @Autowired
+            public TaxRepository taxRepository;
         }
 
         @Component
@@ -142,6 +150,13 @@ public abstract class AbstractIt {
             public AccountReceivablesService accountReceivableService;
             @Autowired
             public CustomerArRepository customerArRepository;
+        }
+        @Component
+        public static class  PriceManagementContext {
+            @Autowired
+            public PriceManagementService priceManagementService;
+            @Autowired
+            public ProductPriceRepository productPriceRepository;
         }
     }
 
@@ -218,6 +233,21 @@ public abstract class AbstractIt {
             await().until(() -> taxManagementContext.customerTaxRepository.existsById(customerId));
             await().until(() -> accountReceivableContext.customerArRepository.existsById(customerId));
             return salesContext.customerRepository.findById(customerId)
+                    .orElseThrow();
+        }
+    }
+
+    @Accessors(fluent = true)
+    protected class TaxManagementFixtures {
+        @Getter(lazy = true)
+        private final Tax tax18Percent = tax();
+
+        protected Tax tax() {
+            CreateTax createTax = Commands.TaxManagement.createTaxBuilder()
+                    .name("ITBIS 18%")
+                    .percentage(18)
+                    .build();
+            return taxManagementContext.taxRepository.findById(taxManagementContext.taxManagementService.createTax(createTax))
                     .orElseThrow();
         }
     }
