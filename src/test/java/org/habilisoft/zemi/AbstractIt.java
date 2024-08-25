@@ -14,6 +14,9 @@ import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
 import org.habilisoft.zemi.catalog.product.domain.Product;
 import org.habilisoft.zemi.catalog.product.domain.ProductRepository;
 import org.habilisoft.zemi.sales.SalesService;
+import org.habilisoft.zemi.sales.customer.application.RegisterCustomer;
+import org.habilisoft.zemi.sales.customer.domain.Customer;
+import org.habilisoft.zemi.sales.customer.domain.CustomerId;
 import org.habilisoft.zemi.sales.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
 import org.habilisoft.zemi.taxesmanagement.domain.CustomerTaxRepository;
@@ -51,6 +54,7 @@ import java.util.Set;
 import static org.habilisoft.zemi.AbstractIt.TenantConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @AutoConfigureMockMvc
 @ExtendWith(ClearDatabase.class)
@@ -79,6 +83,7 @@ public abstract class AbstractIt {
     @Autowired
     private TenantContext tenantContext;
     protected CatalogFixtures catalogFixtures = new CatalogFixtures();
+    protected SalesFixtures salesFixtures = new SalesFixtures();
     protected ColumnMapRowMapper rowMapper = new ColumnMapRowMapper();
 
     protected final String tenantHeader = "TenantID";
@@ -196,6 +201,23 @@ public abstract class AbstractIt {
             Commands.Catalog.CreateCategoryBuilder createCategory = Commands.Catalog.createCategoryBuilder()
                     .name("Food");
             return catalogContext.categoryRepository.findById(catalogContext.catalogService.createCategory(createCategory.build()))
+                    .orElseThrow();
+        }
+    }
+
+    @Accessors(fluent = true)
+    protected class SalesFixtures {
+        @Getter(lazy = true)
+        private final Customer customer1 = customer();
+
+        protected Customer customer() {
+            RegisterCustomer registerCustomer = Commands.Sales.registerCustomerBuilder()
+                    .name("John Doe")
+                    .build();
+            CustomerId customerId = salesContext.salesService.registerCustomer(registerCustomer);
+            await().until(() -> taxManagementContext.customerTaxRepository.existsById(customerId));
+            await().until(() -> accountReceivableContext.customerArRepository.existsById(customerId));
+            return salesContext.customerRepository.findById(customerId)
                     .orElseThrow();
         }
     }

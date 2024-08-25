@@ -5,6 +5,10 @@ import lombok.experimental.UtilityClass;
 import org.habilisoft.zemi.catalog.category.application.CreateCategory;
 import org.habilisoft.zemi.catalog.category.domain.CategoryId;
 import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
+import org.habilisoft.zemi.sales.customer.application.RegisterCustomer;
+import org.habilisoft.zemi.sales.customer.domain.Address;
+import org.habilisoft.zemi.sales.customer.domain.Contact;
+import org.habilisoft.zemi.sales.customer.domain.CustomerType;
 import org.habilisoft.zemi.user.Username;
 import org.habilisoft.zemi.user.domain.PermissionName;
 import org.habilisoft.zemi.user.domain.RoleName;
@@ -19,10 +23,12 @@ import java.util.Set;
 @UtilityClass
 public class Commands {
     public static String user = "test";
+
     @NotNull
     public static LocalDateTime now() {
         return LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
+
     public class Users {
         public static CreateRoleBuilder adminRole() {
             return createRoleBuilder()
@@ -56,6 +62,7 @@ public class Commands {
                     Optional.ofNullable(user).orElse(org.habilisoft.zemi.util.Commands.user), Optional.ofNullable(time).orElse(now()));
         }
     }
+
     public class Catalog {
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "registerProductBuilder")
@@ -68,6 +75,20 @@ public class Commands {
         @Builder(builderMethodName = "createCategoryBuilder")
         public static CreateCategory createCategory(String name, String user, LocalDateTime time) {
             return new CreateCategory(name, Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+    }
+
+    public class Sales {
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "registerCustomerBuilder")
+        public static RegisterCustomer registerCustomer(String name,
+                                                      CustomerType type,
+                                                      Contact contact,
+                                                      Address address, String user, LocalDateTime time) {
+            return new RegisterCustomer(
+                    name, type, contact,
+                    Optional.ofNullable(address).orElseGet(() -> Address.of("Fake Street", "Fake City", "00000")),
+                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
         }
     }
 }
