@@ -1,4 +1,4 @@
-package org.habilisoft.zemi.pricemanagement.domain;
+package org.habilisoft.zemi.pricemanagement.product.domain;
 
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.shared.MonetaryAmount;

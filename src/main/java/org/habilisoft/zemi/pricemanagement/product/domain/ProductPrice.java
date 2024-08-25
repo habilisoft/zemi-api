@@ -1,4 +1,4 @@
-package org.habilisoft.zemi.pricemanagement.domain;
+package org.habilisoft.zemi.pricemanagement.product.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;

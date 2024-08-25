@@ -10,7 +10,7 @@ import org.habilisoft.zemi.customer.application.RegisterCustomer;
 import org.habilisoft.zemi.customer.domain.Address;
 import org.habilisoft.zemi.customer.domain.Contact;
 import org.habilisoft.zemi.customer.domain.CustomerType;
-import org.habilisoft.zemi.pricemanagement.application.ChangeProductPrice;
+import org.habilisoft.zemi.pricemanagement.product.application.ChangeProductPrice;
 import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;

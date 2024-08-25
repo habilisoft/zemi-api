@@ -19,7 +19,7 @@ import org.habilisoft.zemi.customer.domain.Customer;
 import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.pricemanagement.PriceManagementService;
-import org.habilisoft.zemi.pricemanagement.domain.ProductPriceRepository;
+import org.habilisoft.zemi.pricemanagement.product.domain.ProductPriceRepository;
 import org.habilisoft.zemi.sales.SalesService;
 import org.habilisoft.zemi.sales.sale.domain.SaleRepository;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;

@@ -1,10 +1,10 @@
-package org.habilisoft.zemi.pricemanagement.application;
+package org.habilisoft.zemi.pricemanagement.product.application;
 
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.catalog.product.domain.ProductNotFound;
-import org.habilisoft.zemi.pricemanagement.domain.Product;
-import org.habilisoft.zemi.pricemanagement.domain.ProductPriceRepository;
+import org.habilisoft.zemi.pricemanagement.product.domain.Product;
+import org.habilisoft.zemi.pricemanagement.product.domain.ProductPriceRepository;
 import org.habilisoft.zemi.shared.UseCase;
 import org.habilisoft.zemi.user.Username;
 import org.springframework.stereotype.Service;

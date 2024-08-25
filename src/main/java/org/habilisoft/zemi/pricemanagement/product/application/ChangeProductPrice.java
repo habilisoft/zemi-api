@@ -1,4 +1,4 @@
-package org.habilisoft.zemi.pricemanagement.application;
+package org.habilisoft.zemi.pricemanagement.product.application;
 
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.shared.Command;
