@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import org.habilisoft.zemi.accountreceivables.AccountReceivablesService;
+import org.habilisoft.zemi.accountreceivables.domain.CustomerArRepository;
 import org.habilisoft.zemi.catalog.CatalogService;
 import org.habilisoft.zemi.catalog.category.domain.Category;
 import org.habilisoft.zemi.catalog.category.domain.CategoryRepository;
@@ -13,6 +15,8 @@ import org.habilisoft.zemi.catalog.product.domain.Product;
 import org.habilisoft.zemi.catalog.product.domain.ProductRepository;
 import org.habilisoft.zemi.sales.SalesService;
 import org.habilisoft.zemi.sales.customer.domain.CustomerRepository;
+import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
+import org.habilisoft.zemi.taxesmanagement.domain.CustomerTaxRepository;
 import org.habilisoft.zemi.tenant.TenantId;
 import org.habilisoft.zemi.tenant.TenantService;
 import org.habilisoft.zemi.tenant.infra.TenantContext;
@@ -67,6 +71,10 @@ public abstract class AbstractIt {
     protected Context.UserContext userContext;
     @Autowired
     protected Context.SalesContext salesContext;
+    @Autowired
+    protected Context.TaxManagementContext taxManagementContext;
+    @Autowired
+    protected Context.AccountReceivableContext accountReceivableContext;
 
     @Autowired
     private TenantContext tenantContext;
@@ -114,6 +122,21 @@ public abstract class AbstractIt {
             public SalesService salesService;
             @Autowired
             public CustomerRepository customerRepository;
+        }
+        @Component
+        public static class TaxManagementContext {
+            @Autowired
+            public TaxManagementService taxManagementService;
+            @Autowired
+            public CustomerTaxRepository customerTaxRepository;
+        }
+
+        @Component
+        public static class AccountReceivableContext {
+            @Autowired
+            public AccountReceivablesService accountReceivableService;
+            @Autowired
+            public CustomerArRepository customerArRepository;
         }
     }
 

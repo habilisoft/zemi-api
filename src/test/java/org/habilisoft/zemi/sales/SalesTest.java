@@ -18,6 +18,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @DisplayName("Sales Test")
 class SalesTest extends AbstractIt {
@@ -51,7 +52,8 @@ class SalesTest extends AbstractIt {
                 .andReturn();
         // Then
         Integer id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
-        assertThat(salesContext.customerRepository.findById(CustomerId.of(id.longValue())))
+        CustomerId customerId = CustomerId.of(id.longValue());
+        assertThat(salesContext.customerRepository.findById(customerId))
                 .isPresent()
                 .hasValueSatisfying(customer -> {
                     assertThat(customer.getName()).isEqualTo(johnDoe);
@@ -65,5 +67,14 @@ class SalesTest extends AbstractIt {
                             Set.of(Address.of("Calle 1", "Santo Domingo", "10101"))
                     );
                 });
+
+        await().untilAsserted(() ->
+                assertThat(taxManagementContext.customerTaxRepository.findById(customerId))
+                        .isPresent()
+        );
+        await().untilAsserted(() ->
+                assertThat(accountReceivableContext.customerArRepository.findById(customerId))
+                        .isPresent()
+        );
     }
 }

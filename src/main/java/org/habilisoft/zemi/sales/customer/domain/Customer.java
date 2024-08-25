@@ -55,7 +55,7 @@ public class Customer extends AbstractAggregateRoot<Customer> implements Persist
         customer.phoneNumbers = contact.phoneNumbers();
         customer.emailAddress = contact.emailAddress();
         customer.auditableProperties = AuditableProperties.of(createdAt, createdBy);
-        customer.registerEvent(new CustomerRegistered(id));
+        customer.registerEvent(new CustomerRegistered(id, createdAt, createdBy.value()));
         customer.isNew = true;
         return customer;
     }

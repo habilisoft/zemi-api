@@ -1,4 +1,4 @@
-package org.habilisoft.zemi.taxesmanagement;
+package org.habilisoft.zemi.taxesmanagement.domain;
 
 import org.habilisoft.zemi.sales.customer.domain.CustomerId;
 

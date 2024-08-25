@@ -28,8 +28,6 @@ public class SalesController {
                         registerCustomer.type(),
                         registerCustomer.contact(),
                         registerCustomer.address(),
-                        registerCustomer.ncfType(),
-                        registerCustomer.creditLimit(),
                         LocalDateTime.now(),
                         userService.getCurrentUser()
                 )
