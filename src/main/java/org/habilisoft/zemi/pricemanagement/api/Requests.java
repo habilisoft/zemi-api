@@ -20,4 +20,6 @@ interface Requests {
     record ClonePriceList(@NotNull String name) { }
     record ChangeProductPriceCurrentPrice(Set<ProductAndPrice> products) { }
     record AddProductsToPriceList(Set<ProductAndPrice> products) { }
+    record ChangeCustomerPriceList(@NotNull Long priceListId) { }
+    record UpdatePriceList(@NotNull String name) { }
 }

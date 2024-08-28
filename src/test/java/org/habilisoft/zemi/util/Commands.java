@@ -10,6 +10,8 @@ import org.habilisoft.zemi.customer.application.RegisterCustomer;
 import org.habilisoft.zemi.customer.domain.Address;
 import org.habilisoft.zemi.customer.domain.Contact;
 import org.habilisoft.zemi.customer.domain.CustomerType;
+import org.habilisoft.zemi.pricemanagement.pricelist.application.CreatePriceList;
+import org.habilisoft.zemi.pricemanagement.pricelist.domain.ProductIdAndPrice;
 import org.habilisoft.zemi.pricemanagement.product.application.ChangeProductPrice;
 import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
@@ -126,6 +128,11 @@ public class Commands {
             return new ChangeProductPrice(productId,
                     MonetaryAmount.of(new BigDecimal(price)),
                     Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "createPriceListBuilder")
+        public static CreatePriceList createPriceList(String name, Set<ProductIdAndPrice> products, String user, LocalDateTime time) {
+            return new CreatePriceList(name, products, Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
         }
     }
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @EqualsAndHashCode(of = "id")
-@Table(name = "price_list_products")
+@Table(name = "price_list_product")
 public class PriceListProduct implements Persistable<PriceListProductId> {
     @EmbeddedId
     @AttributeOverride(name = "priceListId.value", column = @Column(name = "price_list_id"))
@@ -22,7 +22,7 @@ public class PriceListProduct implements Persistable<PriceListProductId> {
     @AttributeOverride(name = "date", column = @Column(name = "date"))
     private PriceListProductId id;
     @Embedded
-    @AttributeOverride(name = "price.value", column = @Column(name = "price"))
+    @AttributeOverride(name = "value", column = @Column(name = "price"))
     private MonetaryAmount price;
     private boolean isCurrent;
     @Embedded

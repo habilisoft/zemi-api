@@ -12,6 +12,7 @@ import org.habilisoft.zemi.catalog.category.domain.Category;
 import org.habilisoft.zemi.catalog.category.domain.CategoryRepository;
 import org.habilisoft.zemi.catalog.product.application.RegisterProduct;
 import org.habilisoft.zemi.catalog.product.domain.Product;
+import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.catalog.product.domain.ProductRepository;
 import org.habilisoft.zemi.customer.CustomerService;
 import org.habilisoft.zemi.customer.application.RegisterCustomer;
@@ -19,9 +20,15 @@ import org.habilisoft.zemi.customer.domain.Customer;
 import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.customer.domain.CustomerRepository;
 import org.habilisoft.zemi.pricemanagement.PriceManagementService;
+import org.habilisoft.zemi.pricemanagement.customer.domain.CustomerPriceListRepository;
+import org.habilisoft.zemi.pricemanagement.pricelist.application.CreatePriceList;
+import org.habilisoft.zemi.pricemanagement.pricelist.domain.PriceList;
+import org.habilisoft.zemi.pricemanagement.pricelist.domain.PriceListRepository;
+import org.habilisoft.zemi.pricemanagement.pricelist.domain.ProductIdAndPrice;
 import org.habilisoft.zemi.pricemanagement.product.domain.ProductPriceRepository;
 import org.habilisoft.zemi.sales.SalesService;
 import org.habilisoft.zemi.sales.sale.domain.SaleRepository;
+import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
 import org.habilisoft.zemi.taxesmanagement.customer.domain.CustomerTaxRepository;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
@@ -55,6 +62,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import static org.habilisoft.zemi.AbstractIt.TenantConfiguration;
@@ -94,6 +102,7 @@ public abstract class AbstractIt {
     protected CatalogFixtures catalogFixtures = new CatalogFixtures();
     protected CustomerFixtures customerFixtures = new CustomerFixtures();
     protected TaxManagementFixtures taxManagementFixtures = new TaxManagementFixtures();
+    protected PriceManagementFixtures priceManagementFixtures = new PriceManagementFixtures();
 
     protected final String tenantHeader = "TenantID";
     protected static final TenantId tenant = new TenantId("test");
@@ -137,6 +146,7 @@ public abstract class AbstractIt {
             @Autowired
             public SaleRepository saleRepository;
         }
+
         @Component
         public static class CustomerContext {
             @Autowired
@@ -144,6 +154,7 @@ public abstract class AbstractIt {
             @Autowired
             public CustomerRepository customerRepository;
         }
+
         @Component
         public static class TaxManagementContext {
             @Autowired
@@ -161,12 +172,17 @@ public abstract class AbstractIt {
             @Autowired
             public CustomerArRepository customerArRepository;
         }
+
         @Component
-        public static class  PriceManagementContext {
+        public static class PriceManagementContext {
             @Autowired
             public PriceManagementService priceManagementService;
             @Autowired
             public ProductPriceRepository productPriceRepository;
+            @Autowired
+            public PriceListRepository priceListRepository;
+            @Autowired
+            public CustomerPriceListRepository customerPriceListRepository;
         }
     }
 
@@ -258,6 +274,42 @@ public abstract class AbstractIt {
                     .percentage(18)
                     .build();
             return taxManagementContext.taxRepository.findById(taxManagementContext.taxManagementService.createTax(createTax))
+                    .orElseThrow();
+        }
+    }
+
+    @Accessors(fluent = true)
+    protected class PriceManagementFixtures {
+        @Getter(lazy = true)
+        private final PriceList priceList1 = priceList();
+        @Getter(lazy = true)
+        private final PriceList priceList2 = priceListMultiProduct();
+
+        protected PriceList priceList() {
+            Product pizza = catalogFixtures.product1();
+            ProductId productId = pizza.getId();
+            CreatePriceList createPriceList = Commands.PriceManagement.createPriceListBuilder()
+                    .name("Regular")
+                    .products(Set.of(new ProductIdAndPrice(productId, MonetaryAmount.of(new BigDecimal("915.00")))))
+                    .build();
+            return priceManagementContext.priceListRepository.findById(priceManagementContext.priceManagementService.createPriceList(createPriceList))
+                    .orElseThrow();
+        }
+
+        protected PriceList priceListMultiProduct() {
+            Product pizza = catalogFixtures.product1();
+            Product burger = catalogFixtures.product2();
+            ProductId productId = pizza.getId();
+            CreatePriceList createPriceList = Commands.PriceManagement.createPriceListBuilder()
+                    .name("Regular")
+                    .products(
+                            Set.of(
+                                    new ProductIdAndPrice(productId, MonetaryAmount.of(new BigDecimal("915.00"))),
+                                    new ProductIdAndPrice(burger.getId(), MonetaryAmount.of(new BigDecimal("250.00")))
+                            )
+                    )
+                    .build();
+            return priceManagementContext.priceListRepository.findById(priceManagementContext.priceManagementService.createPriceList(createPriceList))
                     .orElseThrow();
         }
     }

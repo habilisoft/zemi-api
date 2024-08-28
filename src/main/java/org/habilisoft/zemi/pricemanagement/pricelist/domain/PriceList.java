@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class PriceList extends AbstractAggregateRoot<PriceList> implements Persistable<PriceListId> {
     @EmbeddedId
-    @AttributeOverride(name = "value", column = @Column(name = "price_list_id"))
+    @AttributeOverride(name = "value", column = @Column(name = "id"))
     private PriceListId id;
     private String name;
     @OneToMany(mappedBy = "id.priceListId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -92,6 +92,11 @@ public class PriceList extends AbstractAggregateRoot<PriceList> implements Persi
                 .filter(product -> Objects.nonNull(product.getId()))
                 .filter(product -> productIds.contains(product.getId().productId()))
                 .forEach(product -> product.deactivate(updatedAt, updatedBy));
+        this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);
+    }
+
+    public void update(String name, LocalDateTime updatedAt, Username updatedBy) {
+        this.name = name;
         this.auditableProperties = this.auditableProperties.update(updatedAt, updatedBy);
     }
 }

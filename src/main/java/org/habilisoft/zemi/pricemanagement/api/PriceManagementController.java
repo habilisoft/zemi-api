@@ -3,10 +3,10 @@ package org.habilisoft.zemi.pricemanagement.api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.pricemanagement.PriceManagementService;
-import org.habilisoft.zemi.pricemanagement.pricelist.application.ChangeProductPriceCurrentPrice;
-import org.habilisoft.zemi.pricemanagement.pricelist.application.ClonePriceList;
-import org.habilisoft.zemi.pricemanagement.pricelist.application.CreatePriceList;
+import org.habilisoft.zemi.pricemanagement.customer.application.ChangeCustomerPriceList;
+import org.habilisoft.zemi.pricemanagement.pricelist.application.*;
 import org.habilisoft.zemi.pricemanagement.pricelist.domain.PriceListId;
 import org.habilisoft.zemi.pricemanagement.product.application.ChangeProductPrice;
 import org.habilisoft.zemi.shared.MonetaryAmount;
@@ -32,6 +32,19 @@ class PriceManagementController {
                 new ChangeProductPrice(
                         ProductId.of(productId),
                         MonetaryAmount.of(changeProductPrice.price()),
+                        LocalDateTime.now(),
+                        userService.getCurrentUser()
+                )
+        );
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/customer/{customerId}/change-price-list")
+    void changeCustomerPriceList(@PathVariable Long customerId, @RequestBody @Valid Requests.ChangeCustomerPriceList changeCustomerPriceList) {
+        priceManagementService.changeCustomerPriceList(
+                new ChangeCustomerPriceList(
+                        CustomerId.of(customerId),
+                        PriceListId.of(changeCustomerPriceList.priceListId()),
                         LocalDateTime.now(),
                         userService.getCurrentUser()
                 )
@@ -70,7 +83,7 @@ class PriceManagementController {
     @PostMapping("/price-list/{priceListId}/add-products")
     void addProductsToPriceList(@PathVariable Long priceListId, @RequestBody @Valid Requests.AddProductsToPriceList addProductsToPriceList) {
         priceManagementService.addProductsToPriceList(
-                new org.habilisoft.zemi.pricemanagement.pricelist.application.AddProductsToPriceList(
+                new AddProductsToPriceList(
                         PriceListId.of(priceListId),
                         addProductsToPriceList.products().stream().map(Requests.ProductAndPrice::toProductIdAndPrice).collect(Collectors.toSet()),
                         LocalDateTime.now(),
@@ -83,7 +96,7 @@ class PriceManagementController {
     @PostMapping("/price-list/{priceListId}/remove-products")
     void removeProductsToPriceList(@PathVariable Long priceListId, @RequestBody @Valid Requests.RemoveProductsToPriceList removeProductsToPriceList) {
         priceManagementService.removeProductsToPriceList(
-                new org.habilisoft.zemi.pricemanagement.pricelist.application.RemoveProductsToPriceList(
+                new RemoveProductsToPriceList(
                         PriceListId.of(priceListId),
                         removeProductsToPriceList.products().stream().map(ProductId::of).collect(Collectors.toSet()),
                         LocalDateTime.now(),
@@ -99,6 +112,18 @@ class PriceManagementController {
                 new ChangeProductPriceCurrentPrice(
                         PriceListId.of(priceListId),
                         changeProductPriceCurrentPrice.products().stream().map(Requests.ProductAndPrice::toProductIdAndPrice).collect(Collectors.toSet()),
+                        LocalDateTime.now(),
+                        userService.getCurrentUser()
+                ));
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/price-list/{priceListId}/update")
+    void updatePriceList(@PathVariable Long priceListId, @RequestBody @Valid Requests.UpdatePriceList updatePriceList) {
+        priceManagementService.updatePriceList(
+                new UpdatePriceList(
+                        PriceListId.of(priceListId),
+                        updatePriceList.name(),
                         LocalDateTime.now(),
                         userService.getCurrentUser()
                 ));
