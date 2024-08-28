@@ -12,8 +12,9 @@ interface Requests {
             @NotNull Set<SaleProduct> products
     ) {
         record SaleProduct(
-                Long productId,
-                BigDecimal quantity
+                @NotNull Long productId,
+                BigDecimal price,
+                @NotNull BigDecimal quantity
         ) {}
     }
 }

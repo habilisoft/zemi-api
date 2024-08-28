@@ -108,7 +108,7 @@ class PriceManagementController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/price-list/{priceListId}/change-products-price")
     void changeProductPriceCurrentPrice(@PathVariable Long priceListId, @RequestBody @Valid Requests.ChangeProductPriceCurrentPrice changeProductPriceCurrentPrice) {
-        priceManagementService.changeProductPriceCurrentPrice(
+        priceManagementService.changeProductPriceCurrentPriceInList(
                 new ChangeProductPriceCurrentPrice(
                         PriceListId.of(priceListId),
                         changeProductPriceCurrentPrice.products().stream().map(Requests.ProductAndPrice::toProductIdAndPrice).collect(Collectors.toSet()),

@@ -284,7 +284,16 @@ public abstract class AbstractIt {
         private final PriceList priceList1 = priceList();
         @Getter(lazy = true)
         private final PriceList priceList2 = priceListMultiProduct();
+        @Getter(lazy = true)
+        private final PriceList priceList3 = priceListEmpty();
 
+        protected PriceList priceListEmpty() {
+            CreatePriceList createPriceList = Commands.PriceManagement.createPriceListBuilder()
+                    .name("Regular")
+                    .build();
+            return priceManagementContext.priceListRepository.findById(priceManagementContext.priceManagementService.createPriceList(createPriceList))
+                    .orElseThrow();
+        }
         protected PriceList priceList() {
             Product pizza = catalogFixtures.product1();
             ProductId productId = pizza.getId();

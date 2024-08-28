@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +51,7 @@ public class MakeSaleUseCase implements UseCase<MakeSale, TransactionalId> {
         existenceMap.entrySet().stream().filter(Predicate.not(Map.Entry::getValue)).findAny().ifPresent(entry -> {
             throw new ProductNotFound(entry.getKey());
         });
-        Map<ProductId, MonetaryAmount> productPrices = priceManagementService.getCurrentPrice(productIds);
+        Map<ProductId, MonetaryAmount> productPrices = productPrices(makeSale);
         Map<ProductId, Set<TaxIdAndRate>> productTaxes = taxManagementService.getProductTaxes(productIds);
         Set<SaleProduct> products = makeSale.products().stream()
                 .map(product -> {
@@ -66,4 +67,27 @@ public class MakeSaleUseCase implements UseCase<MakeSale, TransactionalId> {
         saleRepository.save(sale);
         return transactionalId;
     }
+
+    Map<ProductId, MonetaryAmount> productPrices(MakeSale makeSale) {
+        Set<MakeSale.Product> products = makeSale.products();
+
+        Set<ProductId> productIds = products.stream().map(MakeSale.Product::productId).collect(Collectors.toSet());
+
+        Map<ProductId, MonetaryAmount> priceMap = products.stream().filter(product -> product.price().isPresent())
+                .collect(Collectors.toMap(MakeSale.Product::productId, product -> product.price().get()));
+
+        Supplier<Set<ProductId>> productsWithoutPrice = () ->
+                productIds.stream().filter(productId -> !priceMap.containsKey(productId)).collect(Collectors.toSet());
+
+        makeSale.customerId().ifPresent(customerId -> {
+            Map<ProductId, MonetaryAmount> priceByCustomer = priceManagementService.getCurrentPrice(customerId, productsWithoutPrice.get());
+            priceMap.putAll(priceByCustomer);
+        });
+
+        Map<ProductId, MonetaryAmount> priceByProduct = priceManagementService.getCurrentPrice(productsWithoutPrice.get());
+        priceMap.putAll(priceByProduct);
+        return priceMap;
+
+    }
+
 }

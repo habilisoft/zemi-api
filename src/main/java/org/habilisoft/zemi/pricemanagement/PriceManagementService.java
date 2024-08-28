@@ -65,7 +65,7 @@ public class PriceManagementService {
         return clonePriceListUseCase.execute(clonePriceList);
     }
 
-    public void changeProductPriceCurrentPrice(ChangeProductPriceCurrentPrice changeProductPriceCurrentPrice) {
+    public void changeProductPriceCurrentPriceInList(ChangeProductPriceCurrentPrice changeProductPriceCurrentPrice) {
         changeProductPriceCurrentPriceUseCase.execute(changeProductPriceCurrentPrice);
     }
 

@@ -9,8 +9,12 @@ import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.customer.application.RegisterCustomer;
 import org.habilisoft.zemi.customer.domain.Address;
 import org.habilisoft.zemi.customer.domain.Contact;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.customer.domain.CustomerType;
+import org.habilisoft.zemi.pricemanagement.customer.application.ChangeCustomerPriceList;
+import org.habilisoft.zemi.pricemanagement.pricelist.application.AddProductsToPriceList;
 import org.habilisoft.zemi.pricemanagement.pricelist.application.CreatePriceList;
+import org.habilisoft.zemi.pricemanagement.pricelist.domain.PriceListId;
 import org.habilisoft.zemi.pricemanagement.pricelist.domain.ProductIdAndPrice;
 import org.habilisoft.zemi.pricemanagement.product.application.ChangeProductPrice;
 import org.habilisoft.zemi.shared.MonetaryAmount;
@@ -124,7 +128,7 @@ public class Commands {
     public class PriceManagement {
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "changeProductPriceBuilder")
-        public static ChangeProductPrice changeProductPrice(ProductId productId, double price, String user, LocalDateTime time) {
+        public static ChangeProductPrice changeProductPrice(ProductId productId, String price, String user, LocalDateTime time) {
             return new ChangeProductPrice(productId,
                     MonetaryAmount.of(new BigDecimal(price)),
                     Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
@@ -132,7 +136,27 @@ public class Commands {
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "createPriceListBuilder")
         public static CreatePriceList createPriceList(String name, Set<ProductIdAndPrice> products, String user, LocalDateTime time) {
-            return new CreatePriceList(name, products, Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+            return new CreatePriceList(name,
+                    Optional.ofNullable(products).orElse(Set.of()),
+                    Optional.ofNullable(time).orElse(now()),
+                    Optional.ofNullable(user).orElse(Commands.user));
+        }
+
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "addProductsToPriceListBuilder")
+        public static AddProductsToPriceList addProductsToPriceList(PriceListId priceListId, ProductId productId, String price, String user, LocalDateTime time) {
+            return new AddProductsToPriceList(
+                    priceListId,
+                    Set.of(ProductIdAndPrice.of(productId, MonetaryAmount.of(new BigDecimal(price)))),
+                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "changeCustomerPriceListBuilder")
+        public static ChangeCustomerPriceList changeCustomerPriceList(PriceListId priceListId, CustomerId customerId, String user, LocalDateTime time) {
+            return new ChangeCustomerPriceList(
+                    customerId,
+                    priceListId,
+                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
         }
     }
 }
