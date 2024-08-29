@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -135,7 +136,8 @@ class SalesTest extends AbstractIt {
         PriceList priceList = priceManagementFixtures.priceList3();
         changePriceToProduct(pizza, priceList, pizzaPrice);
         changePriceToProduct(soda, sodaPrice);
-
+        assert johnDoe.getId() != null;
+        await().until(() -> priceManagementContext.customerPriceListRepository.findById(johnDoe.getId()).isPresent());
         changeCustomerPriceList(priceList, johnDoe);
         assert johnDoe.getId() != null;
         Map<String, Object> makeSale = Map.of(
