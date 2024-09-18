@@ -21,6 +21,7 @@ create table invoices
     sequence    integer        not null,
     customer_id integer references customers (id),
     total       numeric(10, 2) not null,
+    balance     numeric(10, 2) not null,
     version     integer        not null,
     ncf         text           not null,
     created_at  timestamp,

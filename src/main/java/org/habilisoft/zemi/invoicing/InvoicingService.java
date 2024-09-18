@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class InvoiceService {
+public class InvoicingService {
     private final GenerateSaleInvoiceUseCase generateSaleInvoiceUseCase;
     @ApplicationModuleListener
     void on(SaleMade saleMade) {

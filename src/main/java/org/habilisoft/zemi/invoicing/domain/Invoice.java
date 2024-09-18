@@ -50,6 +50,7 @@ public class Invoice implements Persistable<TransactionalId> {
         invoice.total = total;
         invoice.balance = total;
         invoice.auditableProperties = AuditableProperties.of(createdAt, createdBy);
+        invoice.isNew = true;
         return invoice;
     }
 }

@@ -19,6 +19,7 @@ import org.habilisoft.zemi.customer.application.RegisterCustomer;
 import org.habilisoft.zemi.customer.domain.Customer;
 import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.customer.domain.CustomerRepository;
+import org.habilisoft.zemi.invoicing.domain.InvoiceRepository;
 import org.habilisoft.zemi.pricemanagement.PriceManagementService;
 import org.habilisoft.zemi.pricemanagement.customer.domain.CustomerPriceListRepository;
 import org.habilisoft.zemi.pricemanagement.pricelist.application.CreatePriceList;
@@ -29,6 +30,7 @@ import org.habilisoft.zemi.pricemanagement.product.domain.ProductPriceRepository
 import org.habilisoft.zemi.sales.SalesService;
 import org.habilisoft.zemi.sales.sale.domain.SaleRepository;
 import org.habilisoft.zemi.shared.MonetaryAmount;
+import org.habilisoft.zemi.shared.TransactionalIdGenerator;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
 import org.habilisoft.zemi.taxesmanagement.customer.domain.CustomerTaxRepository;
 import org.habilisoft.zemi.taxesmanagement.ncf.application.AddNcfSequence;
@@ -63,6 +65,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.modulith.test.EnableScenarios;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -74,6 +77,7 @@ import static org.habilisoft.zemi.AbstractIt.TenantConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@EnableScenarios
 @AutoConfigureMockMvc
 @ExtendWith(ClearDatabase.class)
 @SpringBootTest(properties = "spring.flyway.clean-disabled=false")
@@ -88,6 +92,8 @@ public abstract class AbstractIt {
     @Autowired
     protected JwtService jwtService;
     @Autowired
+    protected TransactionalIdGenerator transactionalIdGenerator;
+    @Autowired
     protected Context.CatalogContext catalogContext;
     @Autowired
     protected Context.UserContext userContext;
@@ -101,9 +107,11 @@ public abstract class AbstractIt {
     protected Context.AccountReceivableContext accountReceivableContext;
     @Autowired
     protected Context.PriceManagementContext priceManagementContext;
+    @Autowired
+    protected Context.InvoicingContext invoicingContext;
 
     @Autowired
-    private TenantContext tenantContext;
+    protected TenantContext tenantContext;
     protected CatalogFixtures catalogFixtures = new CatalogFixtures();
     protected CustomerFixtures customerFixtures = new CustomerFixtures();
     protected TaxManagementFixtures taxManagementFixtures = new TaxManagementFixtures();
@@ -190,6 +198,11 @@ public abstract class AbstractIt {
             public PriceListRepository priceListRepository;
             @Autowired
             public CustomerPriceListRepository customerPriceListRepository;
+        }
+        @Component
+        public static class InvoicingContext {
+            @Autowired
+            public InvoiceRepository invoiceRepository;
         }
     }
 

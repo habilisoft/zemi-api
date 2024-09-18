@@ -2,6 +2,8 @@ package org.habilisoft.zemi.taxesmanagement.ncf.domain;
 
 import jakarta.persistence.Embeddable;
 
+import java.util.Objects;
+
 @Embeddable
 public record Ncf(String value) {
     public Ncf {
@@ -10,10 +12,19 @@ public record Ncf(String value) {
         }
         if (value.length() != 11)
             throw new IllegalArgumentException("Ncf value must be 11 characters long");
-
-        NcSeries.valueOf(String.valueOf(value.charAt(0)));
-        NcfType.valueOf(value.substring(1, 2));
-        if (!value.substring(2).chars().allMatch(Character::isDigit))
+        Objects.requireNonNull(NcfType.of(value.substring(1, 3)));
+        Objects.requireNonNull(String.valueOf(value.charAt(0)));
+        if (!value.substring(3).chars().allMatch(Character::isDigit))
             throw new IllegalArgumentException("Ncf value must contain only digits after the first two characters");
+    }
+
+    public NcfType ncfType() {
+        return NcfType.of(value.substring(1, 3));
+    }
+    public NcSeries series() {
+        return NcSeries.of(String.valueOf(value.charAt(0)));
+    }
+    public String sequence() {
+        return value.substring(3);
     }
 }
