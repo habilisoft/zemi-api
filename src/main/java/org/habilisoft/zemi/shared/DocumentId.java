@@ -9,4 +9,8 @@ public record DocumentId(String value) implements Serializable {
     public static DocumentId of(String value) {
         return new DocumentId(value);
     }
+
+    public String toString() {
+        return value;
+    }
 }

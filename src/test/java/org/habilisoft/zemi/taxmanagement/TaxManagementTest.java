@@ -7,7 +7,9 @@ import org.habilisoft.zemi.catalog.product.domain.Product;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.customer.domain.Customer;
 import org.habilisoft.zemi.customer.domain.CustomerId;
-import org.habilisoft.zemi.taxesmanagement.ncf.NcfType;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcSeries;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfSequence;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfType;
 import org.habilisoft.zemi.taxesmanagement.product.domain.TaxIdAndRate;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.Tax;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
@@ -163,5 +165,56 @@ class TaxManagementTest extends AbstractIt {
         // Then
         assertThat(taxManagementContext.taxManagementService.getProductTaxes(Set.of(productId)))
                 .doesNotContainKey(productId);
+    }
+
+    @Test
+    @DisplayName("Should add a ncf sequence")
+    void shouldAddANcfSequence() throws Exception {
+        // Given
+        Cookie jwtToken = jwtToken(username);
+        Map<String, Object> ncfSequence = Map.of(
+                "ncfType", "FISCAL_CREDIT",
+                "series", "B",
+                "start", 1,
+                "end", 100
+        );
+        // When
+        mockMvc.perform(post("/tax-management/v1/ncf-sequence")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(tenantHeader, tenant.name())
+                        .cookie(jwtToken)
+                        .content(serializeRequestToJson(ncfSequence))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        // Then
+        assertThat(taxManagementContext.ncfSequenceRepository.findByNcfType(NcfType.FISCAL_CREDIT))
+                .isPresent()
+                .hasValueSatisfying(ncf -> {
+                    assertThat(ncf.getSeries()).isEqualTo(NcSeries.B);
+                    assertThat(ncf.getInitialSequence()).isEqualTo(1);
+                    assertThat(ncf.getFinalSequence()).isEqualTo(100);
+                });
+    }
+
+    @Test
+    @DisplayName("Should not add a ncf sequence with an already active ncf type sequence")
+    void shouldNotAddANcfSequenceWithAnAlreadyActiveNcfTypeSequence() throws Exception {
+        // Given
+        Cookie jwtToken = jwtToken(username);
+        NcfSequence existingSequence = taxManagementFixtures.ncfSequenceForFinalConsumer();
+        Map<String, Object> ncfSequence = Map.of(
+                "ncfType", existingSequence.getNcfType().name(),
+                "series", existingSequence.getSeries().name(),
+                "start", 1,
+                "end", 100
+        );
+        // When
+        mockMvc.perform(post("/tax-management/v1/ncf-sequence")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(tenantHeader, tenant.name())
+                        .cookie(jwtToken)
+                        .content(serializeRequestToJson(ncfSequence))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
     }
 }

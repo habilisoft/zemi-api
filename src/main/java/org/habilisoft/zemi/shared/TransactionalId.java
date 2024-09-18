@@ -8,4 +8,8 @@ public record TransactionalId(DocumentId documentId, Long sequence) implements S
     public static TransactionalId of(DocumentId documentId, Long sequence) {
         return new TransactionalId(documentId, sequence);
     }
+
+    public String toString() {
+        return String.format("%s-%d", documentId, sequence);
+    }
 }

@@ -6,6 +6,8 @@ import org.habilisoft.zemi.catalog.product.domain.ProductId;
 import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
 import org.habilisoft.zemi.taxesmanagement.application.ChangeCustomerNcfType;
+import org.habilisoft.zemi.taxesmanagement.ncf.application.AddNcfSequence;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfSequenceActiveException;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
 import org.habilisoft.zemi.taxesmanagement.product.application.RemoveProductTaxes;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
@@ -14,6 +16,7 @@ import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxRate;
 import org.habilisoft.zemi.user.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -25,6 +28,26 @@ import java.util.Map;
 class TaxManagementController {
     private final TaxManagementService taxManagementService;
     private final UserService userService;
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/ncf-sequence")
+    ResponseEntity<Object> addNcfSequence(@RequestBody @Valid Requests.AddNcfSequence addNcfSequence) {
+        try{
+            taxManagementService.addNcfSequence(
+                    new AddNcfSequence(
+                            addNcfSequence.series(),
+                            addNcfSequence.ncfType(),
+                            addNcfSequence.start(),
+                            addNcfSequence.end(),
+                            LocalDateTime.now(),
+                            userService.getCurrentUser()
+                    )
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (NcfSequenceActiveException _) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/customer/{customerId}/change-ncf-type")

@@ -7,6 +7,11 @@ import org.habilisoft.zemi.taxesmanagement.application.ChangeCustomerNcfType;
 import org.habilisoft.zemi.taxesmanagement.application.InitializeCustomerTax;
 import org.habilisoft.zemi.taxesmanagement.customer.application.ChangeCustomerNcfTypeUseCase;
 import org.habilisoft.zemi.taxesmanagement.customer.application.InitializeCustomerTaxUseCase;
+import org.habilisoft.zemi.taxesmanagement.ncf.application.AddNcfSequence;
+import org.habilisoft.zemi.taxesmanagement.ncf.application.AddNcfSequenceUseCase;
+import org.habilisoft.zemi.taxesmanagement.ncf.application.GenerateNcf;
+import org.habilisoft.zemi.taxesmanagement.ncf.application.GenerateNcfUseCase;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.Ncf;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxesUseCase;
 import org.habilisoft.zemi.taxesmanagement.product.application.RemoveProductTaxes;
@@ -39,6 +44,8 @@ public class TaxManagementService {
     private final AddProductTaxesUseCase addProductTaxesUseCase;
     private final RemoveProductTaxesUseCase removeProductTaxesUseCase;
     private final ProductTaxRepository productTaxRepository;
+    private final GenerateNcfUseCase generateNcfUseCase;
+    private final AddNcfSequenceUseCase addNcfSequenceUseCase;
 
     @ApplicationModuleListener
     void on(CustomerRegistered customerRegistered) {
@@ -74,5 +81,13 @@ public class TaxManagementService {
         return productTaxRepository.findTaxesByProductIds(productIds)
                 .stream()
                 .collect(groupingBy(ProductIdAndTax::getProductId, Collectors.mapping(productIdAndTax -> TaxIdAndRate.from(productIdAndTax.getTax()), toSet())));
+    }
+
+    public void addNcfSequence(AddNcfSequence addNcfSequence) {
+        addNcfSequenceUseCase.execute(addNcfSequence);
+    }
+
+    public Ncf generateNcfForCustomer(GenerateNcf.ForCustomer forCustomer) {
+        return generateNcfUseCase.execute(forCustomer);
     }
 }

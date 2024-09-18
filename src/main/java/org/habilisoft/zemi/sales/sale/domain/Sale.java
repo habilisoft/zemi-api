@@ -52,6 +52,7 @@ public class Sale extends AbstractAggregateRoot<Sale> implements Persistable<Tra
         sale.products = products;
         sale.auditableProperties = AuditableProperties.of(createdAt, createdBy);
         sale.isNew = true;
+        sale.andEvent(new SaleMade(id, sale.customerId, sale.total, sale.date, createdBy.value()));
         return sale;
     }
 }

@@ -31,6 +31,11 @@ import org.habilisoft.zemi.sales.sale.domain.SaleRepository;
 import org.habilisoft.zemi.shared.MonetaryAmount;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
 import org.habilisoft.zemi.taxesmanagement.customer.domain.CustomerTaxRepository;
+import org.habilisoft.zemi.taxesmanagement.ncf.application.AddNcfSequence;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcSeries;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfSequence;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfSequenceRepository;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfType;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.Tax;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxRepository;
@@ -163,6 +168,8 @@ public abstract class AbstractIt {
             public CustomerTaxRepository customerTaxRepository;
             @Autowired
             public TaxRepository taxRepository;
+            @Autowired
+            public NcfSequenceRepository ncfSequenceRepository;
         }
 
         @Component
@@ -267,6 +274,8 @@ public abstract class AbstractIt {
     protected class TaxManagementFixtures {
         @Getter(lazy = true)
         private final Tax tax18Percent = tax();
+        @Getter(lazy = true)
+        private final NcfSequence ncfSequenceForFinalConsumer = ncfSequence();
 
         protected Tax tax() {
             CreateTax createTax = Commands.TaxManagement.createTaxBuilder()
@@ -274,6 +283,17 @@ public abstract class AbstractIt {
                     .percentage(18)
                     .build();
             return taxManagementContext.taxRepository.findById(taxManagementContext.taxManagementService.createTax(createTax))
+                    .orElseThrow();
+        }
+        protected NcfSequence ncfSequence() {
+            AddNcfSequence addNcfSequence = Commands.TaxManagement.addNcfSequenceBuilder()
+                    .series(NcSeries.B)
+                    .ncfType(NcfType.FINAL_CONSUMER)
+                    .start(1L)
+                    .end(100L)
+                    .build();
+            taxManagementContext.taxManagementService.addNcfSequence(addNcfSequence);
+            return taxManagementContext.ncfSequenceRepository.findByNcfType(NcfType.FINAL_CONSUMER)
                     .orElseThrow();
         }
     }

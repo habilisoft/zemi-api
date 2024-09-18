@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.habilisoft.zemi.customer.domain.CustomerId;
-import org.habilisoft.zemi.taxesmanagement.ncf.NcfType;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfType;
 import org.habilisoft.zemi.user.AuditableProperties;
 import org.habilisoft.zemi.user.Username;
 import org.springframework.data.domain.AbstractAggregateRoot;

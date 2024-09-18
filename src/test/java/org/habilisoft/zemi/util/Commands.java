@@ -18,6 +18,9 @@ import org.habilisoft.zemi.pricemanagement.pricelist.domain.PriceListId;
 import org.habilisoft.zemi.pricemanagement.pricelist.domain.ProductIdAndPrice;
 import org.habilisoft.zemi.pricemanagement.product.application.ChangeProductPrice;
 import org.habilisoft.zemi.shared.MonetaryAmount;
+import org.habilisoft.zemi.taxesmanagement.ncf.application.AddNcfSequence;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcSeries;
+import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfType;
 import org.habilisoft.zemi.taxesmanagement.product.application.AddProductTaxes;
 import org.habilisoft.zemi.taxesmanagement.tax.application.CreateTax;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
@@ -122,6 +125,13 @@ public class Commands {
         public static AddProductTaxes addProductTaxes(ProductId productId, Set<TaxId> taxes, String user, LocalDateTime time) {
             return new AddProductTaxes(productId,
                     taxes, Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+        }
+        @SuppressWarnings("unused")
+        @Builder(builderMethodName = "addNcfSequenceBuilder")
+        public static AddNcfSequence addNcfSequence(NcSeries series, NcfType ncfType, Long start, Long end, String user, LocalDateTime time) {
+            return new AddNcfSequence(
+                    series, ncfType, start, end,
+                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
         }
     }
 
