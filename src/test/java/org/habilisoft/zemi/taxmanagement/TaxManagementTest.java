@@ -176,7 +176,8 @@ class TaxManagementTest extends AbstractIt {
                 "ncfType", "FISCAL_CREDIT",
                 "series", "B",
                 "start", 1,
-                "end", 100
+                "end", 100,
+                "expirationDate", "2025-12-31"
         );
         // When
         mockMvc.perform(post("/tax-management/v1/ncf-sequence")
@@ -206,7 +207,8 @@ class TaxManagementTest extends AbstractIt {
                 "ncfType", existingSequence.getNcfType().name(),
                 "series", existingSequence.getSeries().name(),
                 "start", 1,
-                "end", 100
+                "end", 100,
+                "expirationDate", "2025-12-31"
         );
         // When
         mockMvc.perform(post("/tax-management/v1/ncf-sequence")

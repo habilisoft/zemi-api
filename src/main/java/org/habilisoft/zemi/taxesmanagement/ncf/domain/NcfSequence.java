@@ -8,6 +8,7 @@ import org.habilisoft.zemi.user.Username;
 import org.springframework.data.domain.Persistable;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -26,6 +27,8 @@ public class NcfSequence implements Persistable<NcfSequence.NcfSequenceId> {
     @Column(name = "ncf_series")
     @Enumerated(EnumType.STRING)
     private NcSeries series;
+    @Column(name = "expiration_date")
+    private LocalDate expirationDate;
     @Transient
     private boolean isNew;
 
@@ -38,7 +41,7 @@ public class NcfSequence implements Persistable<NcfSequence.NcfSequenceId> {
         return id.ncfType;
     }
 
-    public static NcfSequence newSequence(NcfType ncfType, NcSeries series, Long initialSequence, Long finalSequence, LocalDateTime createdAt, Username createdBy) {
+    public static NcfSequence newSequence(NcfType ncfType, NcSeries series, Long initialSequence, Long finalSequence, LocalDate expirationDate, LocalDateTime createdAt, Username createdBy) {
         NcfSequence ncfSequence = new NcfSequence();
         ncfSequence.id = NcfSequenceId.of(ncfType, createdAt);
         ncfSequence.initialSequence = initialSequence;
@@ -46,12 +49,19 @@ public class NcfSequence implements Persistable<NcfSequence.NcfSequenceId> {
         ncfSequence.currentSequence = initialSequence;
         ncfSequence.active = true;
         ncfSequence.series = series;
+        if (expirationDate.isBefore(LocalDate.now()))
+            throw new NcfSequenceInvalidExpirationDateException();
+        ncfSequence.expirationDate = expirationDate;
         ncfSequence.isNew = true;
         ncfSequence.auditableProperties = AuditableProperties.of(createdAt, createdBy);
         return ncfSequence;
     }
 
     public Ncf increment(LocalDateTime createdAt, Username createdBy) {
+        if (!active)
+            throw new NcfSequenceInactiveException(getNcfType());
+        if (expirationDate.isBefore(LocalDate.now()))
+            throw new NcfSequenceExpiredException(getNcfType());
         if (currentSequence >= finalSequence)
             throw new NcfExhaustedException(getNcfType());
         Ncf ncf = new Ncf(String.format("%s%s%08d", series.getValue(), getNcfType().getValue(), currentSequence++));

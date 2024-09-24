@@ -33,6 +33,7 @@ import org.habilisoft.zemi.user.usecase.UserCommands;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -129,10 +130,13 @@ public class Commands {
         }
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "addNcfSequenceBuilder")
-        public static AddNcfSequence addNcfSequence(NcSeries series, NcfType ncfType, Long start, Long end, String user, LocalDateTime time) {
+        public static AddNcfSequence addNcfSequence(NcSeries series, NcfType ncfType,
+                                                    Long start, Long end, LocalDate expirationDate, String user, LocalDateTime time) {
             return new AddNcfSequence(
                     series, ncfType, start, end,
-                    Optional.ofNullable(time).orElse(now()), Optional.ofNullable(user).orElse(Commands.user));
+                    Optional.ofNullable(expirationDate).orElse(LocalDate.now().plusYears(5)),
+                    Optional.ofNullable(time).orElse(now()),
+                    Optional.ofNullable(user).orElse(Commands.user));
         }
         @SuppressWarnings("unused")
         @Builder(builderMethodName = "changeCustomerNcfTypeBuilder")

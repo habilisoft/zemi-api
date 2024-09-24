@@ -5,6 +5,7 @@ import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcSeries;
 import org.habilisoft.zemi.taxesmanagement.ncf.domain.NcfType;
 import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 interface Requests {
@@ -13,5 +14,6 @@ interface Requests {
     record UpdateTax(@NotNull String name, @NotNull double rate) {}
     record AddProductTax(@NotNull Set<TaxId> taxes) {}
     record RemoveProductTax(@NotNull Set<TaxId> taxes) {}
-    record AddNcfSequence(@NotNull NcfType ncfType, @NotNull NcSeries series, @NotNull Long start, @NotNull Long end) {}
+    record AddNcfSequence(@NotNull NcfType ncfType, @NotNull NcSeries series, @NotNull Long start, @NotNull Long end, @NotNull
+                          LocalDate expirationDate) {}
 }

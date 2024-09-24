@@ -24,6 +24,7 @@ public class AddNcfSequenceUseCase implements UseCase<AddNcfSequence, Void> {
                 addNcfSequence.series(),
                 addNcfSequence.initialSequence(),
                 addNcfSequence.finalSequence(),
+                addNcfSequence.expirationDate(),
                 addNcfSequence.time(),
                 Username.of(addNcfSequence.user())
         );

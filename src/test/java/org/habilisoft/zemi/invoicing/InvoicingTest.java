@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.habilisoft.zemi.util.Commands.user;
 
 @DisplayName("Invoicing")
@@ -32,6 +33,10 @@ class InvoicingTest extends AbstractIt {
                 .customerId(customer.getId())
                 .ncfType(ncfSequence.getNcfType())
                 .build();
+        await().until(() -> {
+            assert customer.getId() != null;
+            return taxManagementContext.customerTaxRepository.findById(customer.getId()).isPresent();
+        });
         taxManagementContext.taxManagementService.changeCustomerNcfType(changeCustomerNcfType);
         TransactionalId transactionalId = transactionalIdGenerator.generate(DocumentId.of("SALE"));
         SaleMade saleMade = new SaleMade(

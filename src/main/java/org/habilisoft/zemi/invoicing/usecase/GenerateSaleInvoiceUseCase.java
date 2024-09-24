@@ -5,7 +5,6 @@ import org.habilisoft.zemi.invoicing.domain.Invoice;
 import org.habilisoft.zemi.invoicing.domain.InvoiceRepository;
 import org.habilisoft.zemi.shared.IdempotentUseCase;
 import org.habilisoft.zemi.taxesmanagement.TaxManagementService;
-import org.habilisoft.zemi.taxesmanagement.ncf.application.GenerateNcf;
 import org.habilisoft.zemi.taxesmanagement.ncf.domain.Ncf;
 import org.habilisoft.zemi.user.Username;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class GenerateSaleInvoiceUseCase implements IdempotentUseCase<GenerateSaleInvoice, Void> {
     private final InvoiceRepository invoiceRepository;
     private final TaxManagementService taxManagementService;
+
     @Override
     public String idempotencyKey(GenerateSaleInvoice generateSaleInvoice) {
         return generateSaleInvoice.transactionalId().toString();
@@ -23,11 +23,9 @@ public class GenerateSaleInvoiceUseCase implements IdempotentUseCase<GenerateSal
     @Override
     public Void execute(GenerateSaleInvoice generateSaleInvoice) {
         Ncf ncf = taxManagementService.generateNcfForCustomer(
-                new GenerateNcf.ForCustomer(
-                        generateSaleInvoice.customerId(),
-                        generateSaleInvoice.time(),
-                        generateSaleInvoice.user()
-                )
+                generateSaleInvoice.customerId(),
+                generateSaleInvoice.user(),
+                generateSaleInvoice.time()
         );
         Invoice invoice = Invoice.generate(
                 generateSaleInvoice.transactionalId(),

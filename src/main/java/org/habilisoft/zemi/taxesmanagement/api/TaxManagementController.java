@@ -39,6 +39,7 @@ class TaxManagementController {
                             addNcfSequence.ncfType(),
                             addNcfSequence.start(),
                             addNcfSequence.end(),
+                            addNcfSequence.expirationDate(),
                             LocalDateTime.now(),
                             userService.getCurrentUser()
                     )

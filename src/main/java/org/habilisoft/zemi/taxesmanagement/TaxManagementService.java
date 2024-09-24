@@ -2,6 +2,7 @@ package org.habilisoft.zemi.taxesmanagement;
 
 import lombok.RequiredArgsConstructor;
 import org.habilisoft.zemi.catalog.product.domain.ProductId;
+import org.habilisoft.zemi.customer.domain.CustomerId;
 import org.habilisoft.zemi.customer.domain.CustomerRegistered;
 import org.habilisoft.zemi.taxesmanagement.application.ChangeCustomerNcfType;
 import org.habilisoft.zemi.taxesmanagement.application.InitializeCustomerTax;
@@ -27,6 +28,7 @@ import org.habilisoft.zemi.taxesmanagement.tax.domain.TaxId;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -87,7 +89,7 @@ public class TaxManagementService {
         addNcfSequenceUseCase.execute(addNcfSequence);
     }
 
-    public Ncf generateNcfForCustomer(GenerateNcf.ForCustomer forCustomer) {
-        return generateNcfUseCase.execute(forCustomer);
+    public Ncf generateNcfForCustomer(CustomerId customerId, String generatedBy, LocalDateTime generatedAt) {
+        return generateNcfUseCase.execute(new GenerateNcf.ForCustomer(customerId, generatedAt, generatedBy));
     }
 }

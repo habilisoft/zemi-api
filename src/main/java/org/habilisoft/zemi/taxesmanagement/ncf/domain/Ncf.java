@@ -1,10 +1,12 @@
 package org.habilisoft.zemi.taxesmanagement.ncf.domain;
 
 import jakarta.persistence.Embeddable;
+import org.springframework.modulith.NamedInterface;
 
 import java.util.Objects;
 
 @Embeddable
+@NamedInterface
 public record Ncf(String value) {
     public Ncf {
         if (value == null || value.isBlank()) {
