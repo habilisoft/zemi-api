@@ -42,6 +42,7 @@ public class Sale extends AbstractAggregateRoot<Sale> implements Persistable<Tra
     public static Sale makeSaleForCustomer(TransactionalId id, CustomerId customerId, Set<SaleProduct> products, LocalDateTime createdAt, Username createdBy) {
         Sale sale = makeSale(id, products, createdAt, createdBy);
         sale.customerId = customerId;
+        sale.andEvent(new SaleMade(id, customerId, sale.total, sale.date, createdBy.value()));
         return sale;
     }
     public static Sale makeSale(TransactionalId id, Set<SaleProduct> products, LocalDateTime createdAt, Username createdBy) {
@@ -52,7 +53,6 @@ public class Sale extends AbstractAggregateRoot<Sale> implements Persistable<Tra
         sale.products = products;
         sale.auditableProperties = AuditableProperties.of(createdAt, createdBy);
         sale.isNew = true;
-        sale.andEvent(new SaleMade(id, sale.customerId, sale.total, sale.date, createdBy.value()));
         return sale;
     }
 }
